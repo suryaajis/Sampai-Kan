@@ -1,24 +1,28 @@
 const nodemailer = require('nodemailer')
 
-const transporter = nodemailer.createTransport({
-    service: "hotmail",
-    auth: {
-        user: 'sampaikanpaikan@hotmail.com',
-        pass: '123456789!@#$'
-    }
-})
+const { MAIL_SERVICE, MAIL_USER, MAIL_PASS, MAIL_FROM } = process.env
 
-// const option = {
-//     from: "sampaikanpaikan@hotmail.com",
-//     to: "abraham.siahaan1997@gmail.com",
-//     subject: "ini test",
-//     text: "hey, it works"
-// }
+const isConfigured = Boolean(MAIL_USER && MAIL_PASS)
 
-// transporter.sendMail(option, (err, info) => {
-//     if (err) console.log(err);
-//     else console.log("sent: " + info.response);
-    
-// })
+const transporter = isConfigured
+  ? nodemailer.createTransport({
+      service: MAIL_SERVICE || 'hotmail',
+      auth: { user: MAIL_USER, pass: MAIL_PASS }
+    })
+  : null
 
-module.exports = transporter
+function sendMail({ to, subject, text, html }) {
+  if (!transporter) {
+    console.log(`[mailer skipped] ${subject} -> ${to}`)
+    return Promise.resolve({ skipped: true })
+  }
+  return transporter.sendMail({
+    from: MAIL_FROM || MAIL_USER,
+    to,
+    subject,
+    text,
+    html
+  })
+}
+
+module.exports = { transporter, sendMail }

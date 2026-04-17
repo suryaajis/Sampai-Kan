@@ -1,47 +1,50 @@
-<!-- Footer -->
-<footer class="w3-center w3-black w3-padding-64 w3-opacity w3-hover-opacity-off" style="background-color:black;">
-  <a href="/" class="w3-button w3-light-grey"><i class="fa fa-arrow-up w3-margin-right"></i>HOME</a>
-  <div class="w3-xlarge w3-section">
-    <i class="fa fa-facebook-official w3-hover-opacity"></i>
-    <i class="fa fa-instagram w3-hover-opacity"></i>
-    <i class="fa fa-snapchat w3-hover-opacity"></i>
-    <i class="fa fa-pinterest-p w3-hover-opacity"></i>
-    <i class="fa fa-twitter w3-hover-opacity"></i>
-    <i class="fa fa-linkedin w3-hover-opacity"></i>
-  </div>
-  <p>Pair Project Team 1</p>
-</footer>
- 
-<script>
-// Modal Image Gallery
-function onClick(element) {
-  document.getElementById("img01").src = element.src;
-  document.getElementById("modal01").style.display = "block";
-  var captionText = document.getElementById("caption");
-  captionText.innerHTML = element.alt;
-}
+  <footer class="mt-auto bg-gray-900 text-gray-300">
+    <div class="max-w-7xl mx-auto px-6 py-12 grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div>
+        <div class="flex items-center gap-2 mb-3">
+          <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+            <i class="fa-solid fa-motorcycle text-white"></i>
+          </div>
+          <span class="text-xl font-bold text-white">Sampai-Kan</span>
+        </div>
+        <p class="text-sm text-gray-400">Pesan makanan favorit, antar sampai depan pintu. Cepat, aman, terpercaya.</p>
+      </div>
+      <div>
+        <h4 class="text-white font-semibold mb-3">Layanan</h4>
+        <ul class="space-y-2 text-sm">
+          <li><a href="/customer" class="hover:text-primary">Makanan</a></li>
+          <li><a href="/customer?categoryId=2" class="hover:text-primary">Minuman</a></li>
+          <li><a href="/customer?categoryId=3" class="hover:text-primary">Snack</a></li>
+          <li><a href="/customer?categoryId=4" class="hover:text-primary">Dessert</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-semibold mb-3">Tentang</h4>
+        <ul class="space-y-2 text-sm">
+          <li><a href="#" class="hover:text-primary">Karir</a></li>
+          <li><a href="#" class="hover:text-primary">Syarat & Ketentuan</a></li>
+          <li><a href="#" class="hover:text-primary">Privasi</a></li>
+          <li><a href="#" class="hover:text-primary">Hubungi Kami</a></li>
+        </ul>
+      </div>
+      <div>
+        <h4 class="text-white font-semibold mb-3">Ikuti Kami</h4>
+        <div class="flex gap-3">
+          <a href="#" class="w-9 h-9 rounded-full bg-gray-800 hover:bg-primary flex items-center justify-center transition"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="#" class="w-9 h-9 rounded-full bg-gray-800 hover:bg-primary flex items-center justify-center transition"><i class="fa-brands fa-instagram"></i></a>
+          <a href="#" class="w-9 h-9 rounded-full bg-gray-800 hover:bg-primary flex items-center justify-center transition"><i class="fa-brands fa-twitter"></i></a>
+          <a href="#" class="w-9 h-9 rounded-full bg-gray-800 hover:bg-primary flex items-center justify-center transition"><i class="fa-brands fa-tiktok"></i></a>
+        </div>
+      </div>
+    </div>
+    <div class="border-t border-gray-800">
+      <div class="max-w-7xl mx-auto px-6 py-4 text-sm text-gray-500 flex flex-col md:flex-row justify-between">
+        <p>© <%= new Date().getFullYear() %> Sampai-Kan. All rights reserved.</p>
+        <p>Made with <i class="fa-solid fa-heart text-primary"></i> by Pair Project Team 1</p>
+      </div>
+    </div>
+  </footer>
 
-// Change style of navbar on scroll
-window.onscroll = function() {myFunction()};
-function myFunction() {
-    var navbar = document.getElementById("myNavbar");
-    if (document.body.scrollTop > 100 || document.documentElement.scrollTop > 100) {
-        navbar.className = "w3-bar" + " w3-card" + " w3-animate-top" + " w3-white";
-    } else {
-        navbar.className = navbar.className.replace(" w3-card w3-animate-top w3-white", "");
-    }
-}
-
-// Used to toggle the menu on small screens when clicking on the menu button
-function toggleFunction() {
-    var x = document.getElementById("navDemo");
-    if (x.className.indexOf("w3-show") == -1) {
-        x.className += " w3-show";
-    } else {
-        x.className = x.className.replace(" w3-show", "");
-    }
-}
-</script>
-
+  <script src="/js/main.js"></script>
 </body>
 </html>

@@ -1,0 +1,80 @@
+<% const pageTitle = 'Keranjang' %>
+<%- include('../partials/header', { pageTitle }) %>
+<%- include('../partials/nav-customer') %>
+
+<section class="max-w-5xl mx-auto px-4 md:px-6 py-8 flex-1 w-full">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-2xl md:text-3xl font-bold">Keranjang Saya</h1>
+      <p class="text-gray-500 text-sm mt-1"><%= totals.itemCount %> item dalam keranjang</p>
+    </div>
+    <% if (cart.length > 0) { %>
+      <form action="/customer/cart/clear" method="POST">
+        <button class="text-sm text-red-600 hover:underline"><i class="fa-solid fa-trash mr-1"></i>Kosongkan</button>
+      </form>
+    <% } %>
+  </div>
+
+  <% if (cart.length === 0) { %>
+    <div class="bg-white rounded-3xl p-12 text-center">
+      <div class="w-24 h-24 mx-auto bg-primary-light rounded-full flex items-center justify-center text-primary">
+        <i class="fa-solid fa-cart-shopping text-4xl"></i>
+      </div>
+      <h3 class="text-xl font-semibold mt-4">Keranjang masih kosong</h3>
+      <p class="text-gray-500 mt-1">Yuk mulai belanja dan tambahkan menu favoritmu!</p>
+      <a href="/customer" class="inline-block mt-6 px-6 py-3 btn-primary rounded-full font-semibold">
+        <i class="fa-solid fa-utensils mr-2"></i>Jelajah Menu
+      </a>
+    </div>
+  <% } else { %>
+    <div class="grid lg:grid-cols-3 gap-6">
+      <div class="lg:col-span-2 space-y-3">
+        <% cart.forEach(item => { %>
+          <div class="bg-white rounded-2xl p-4 flex gap-4 items-center">
+            <div class="w-20 h-20 bg-gray-100 rounded-xl overflow-hidden shrink-0">
+              <img src="<%= item.imageUrl %>" alt="<%= item.name %>" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/200?text=Menu'">
+            </div>
+            <div class="flex-1 min-w-0">
+              <h3 class="font-semibold truncate"><%= item.name %></h3>
+              <p class="text-primary font-bold mt-1"><%= formatPrice(item.price) %></p>
+            </div>
+            <div class="flex flex-col items-end gap-2">
+              <form action="/customer/cart/remove/<%= item.itemId %>" method="POST">
+                <button type="submit" class="text-gray-400 hover:text-red-500" title="Hapus"><i class="fa-solid fa-trash"></i></button>
+              </form>
+              <div class="flex items-center border border-gray-200 rounded-full">
+                <form action="/customer/cart/update/<%= item.itemId %>" method="POST">
+                  <input type="hidden" name="action" value="dec">
+                  <button type="submit" class="w-8 h-8 flex items-center justify-center text-primary hover:bg-primary-light rounded-l-full"><i class="fa-solid fa-minus text-xs"></i></button>
+                </form>
+                <span class="w-8 text-center font-semibold text-sm"><%= item.quantity %></span>
+                <form action="/customer/cart/update/<%= item.itemId %>" method="POST">
+                  <input type="hidden" name="action" value="inc">
+                  <button type="submit" class="w-8 h-8 flex items-center justify-center text-primary hover:bg-primary-light rounded-r-full"><i class="fa-solid fa-plus text-xs"></i></button>
+                </form>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-2xl p-6 sticky top-24">
+          <h3 class="font-bold text-lg mb-4">Ringkasan Pesanan</h3>
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between"><span class="text-gray-600">Subtotal</span><span class="font-medium"><%= formatPrice(totals.subtotal) %></span></div>
+            <div class="flex justify-between"><span class="text-gray-600">Ongkos Kirim</span><span class="font-medium"><%= formatPrice(totals.deliveryFee) %></span></div>
+            <hr class="border-gray-100 my-3">
+            <div class="flex justify-between text-base"><span class="font-semibold">Total</span><span class="font-bold text-primary text-lg"><%= formatPrice(totals.total) %></span></div>
+          </div>
+          <a href="/customer/checkout" class="mt-6 block w-full text-center btn-primary py-3 rounded-xl font-semibold">
+            <i class="fa-solid fa-credit-card mr-2"></i>Lanjut ke Checkout
+          </a>
+          <a href="/customer" class="mt-2 block w-full text-center text-gray-600 hover:text-primary py-2 text-sm">Tambah menu lain</a>
+        </div>
+      </div>
+    </div>
+  <% } %>
+</section>
+
+<%- include('../partials/footer') %>

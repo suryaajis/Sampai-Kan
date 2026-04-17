@@ -1,118 +1,59 @@
-const { Driver, Customer, Item, Category } = require('../models')
-const transporter = require('../nodemailer')
+const { Driver, Order } = require('../models')
+const formatDate = require('../helpers/formatDate')
 
 class DriverController {
-  static pickUpItem(req, res) {
-    let data = {
-      driver: {},
-      item: {},
-      customer: {}
+  static async profile(req, res, next) {
+    try {
+      const driver = await Driver.findByPk(req.session.userId)
+      const deliveredCount = await Order.count({
+        where: { DriverId: req.session.userId, status: 'delivered' }
+      })
+      res.render('drivers/profile', {
+        driver,
+        deliveredCount,
+        formatDate,
+        errors: []
+      })
+    } catch (err) {
+      next(err)
     }
-    let driverId = req.session.userId
+  }
 
-    Driver.findByPk(driverId, {
-      include: Item
-    })
-    .then(driver => {
-      if (driver.ItemId === null) {
-        res.render('drivers/wait')
-      } else {
-        data.driver = driver
-        data.item = driver.Item
-        console.log(driver)
-
-        let customerId = driver.Item.CustomerId
-        if(customerId !== null ){
-          return Customer.findByPk(customerId)
-        } else {
-          res.redirect('/driver/wait')
-        }
+  static async postProfile(req, res, next) {
+    try {
+      const { fullName, email, phone, profileUrl, password } = req.body
+      const driver = await Driver.findByPk(req.session.userId)
+      if (!driver) {
+        req.flash('error', 'Akun tidak ditemukan')
+        return res.redirect('/login')
       }
-    })
-    .then(customer => {
-      data.customer = customer
-      res.render('drivers/pickItem', {data})
-    })
-    .catch(err => {
-      res.send(err)
-    })
-  }
 
-  static deliver(req, res) {
-    let driverId = req.session.userId
-    Driver.findByPk(driverId, {
-      include: Item
-    })
-    .then(data => {
-      let customerId = data.Item.CustomerId
-      return Customer.findByPk(customerId)
-    })
-    .then(customer => {
+      driver.fullName = fullName
+      driver.email = email
+      driver.phone = phone
+      if (profileUrl && profileUrl.trim() !== '') driver.profileUrl = profileUrl
+      if (password && password.trim() !== '') driver.password = password
 
-      const option = {
-            from: "sampaikanpaikan@hotmail.com",
-            to: "suryaajis330@gmail.com",
-            subject: "Delivering",
-            text: `Hai ${customer.fullName}, your order is on the way..`
-        }
-
-      transporter.sendMail(option, (err, info) => {
-          if (err) console.log(err);
-          else console.log("sent: " + info.response);
-      })
-
-      res.redirect('/driver')
-    })
-    .catch(err => {
-      res.send(err)
-    })  
-  }
-
-  static arrived(req, res) {
-    let driverId = req.session.userId
-    let customerId 
-    let itemId
-    console.log(driverId)
-    Driver.findByPk(driverId, {
-      include: Item
-    })
-    .then(data => {
-      itemId = data.Item.id
-      customerId = data.Item.CustomerId
-      return Customer.findByPk(customerId)
-    })
-    .then(customer => {
-
-      const option = {
-            from: "sampaikanpaikan@hotmail.com",
-            to: `${customer.email}`,
-            subject: "Enjoy your order!",
-            text: `Hai ${customer.fullName}, your order has arrived`
-        }
-
-      transporter.sendMail(option, (err, info) => {
-          if (err) console.log(err);
-          else console.log("sent: " + info.response);
-      })
-      return Driver.update({ ItemId: null }, { where: { id: driverId } })
-    })
-    .then(() => {
-      return Item.update({ CustomerId: null }, { where: { id: itemId }})
-    })
-    .then(() => {
-      res.redirect('/driver/wait')
-    })
-    .catch(err => {
-      res.send(err)
-    })  
-  }
-
-
-  static getWait(req, res) {
-    res.render('drivers/wait')
+      await driver.save()
+      req.session.fullName = driver.fullName
+      req.session.email = driver.email
+      req.flash('success', 'Profil berhasil diperbarui')
+      res.redirect('/driver/profile')
+    } catch (err) {
+      const errors = err.errors
+        ? err.errors.map(e => e.message)
+        : [err.message || 'Gagal memperbarui profil']
+      try {
+        const driver = await Driver.findByPk(req.session.userId)
+        const deliveredCount = await Order.count({
+          where: { DriverId: req.session.userId, status: 'delivered' }
+        })
+        res.render('drivers/profile', { driver, deliveredCount, formatDate, errors })
+      } catch (e) {
+        next(e)
+      }
+    }
   }
 }
-
-
 
 module.exports = DriverController

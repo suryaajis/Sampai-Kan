@@ -1,81 +1,103 @@
-const { Item, Category, Driver, Customer } = require('../models')
+const { Item, Category, Customer, Order, OrderItem } = require('../models')
 const formatPrice = require('../helpers/formatPrice')
-const { Op } = require('sequelize')
-
+const formatDate = require('../helpers/formatDate')
+const statusLabel = require('../helpers/statusLabel')
 
 class CustomerController {
-  static getListItems(req, res) {
-    const { search } = req.query
-    
-    Item.getAll(Category, search)
-    .then(items => {
-        res.render('customers/listItems', { data: items, formatPrice })
-    })
+  static async getListItems(req, res, next) {
+    try {
+      const { search, categoryId } = req.query
+      const [items, categories] = await Promise.all([
+        Item.getAll(Category, { search, categoryId }),
+        Category.findAll({ order: [['id', 'ASC']] })
+      ])
+      res.render('customers/listItems', {
+        items,
+        categories,
+        formatPrice,
+        filters: { search: search || '', categoryId: categoryId || '' }
+      })
+    } catch (err) {
+      next(err)
+    }
   }
 
-  static buyItem(req, res) {
-    let driverContact = {
-        fullName: '',
-        phone: '',
-        url: ''
+  static async getItemDetail(req, res, next) {
+    try {
+      const item = await Item.findByPk(req.params.itemId, { include: [Category] })
+      if (!item) {
+        req.flash('error', 'Menu tidak ditemukan')
+        return res.redirect('/customer')
+      }
+      res.render('customers/itemDetail', { item, formatPrice })
+    } catch (err) {
+      next(err)
     }
-    Item.update({ CustomerId: req.session.userId }, {
-        where: { id: req.params.itemId }
-      })
-      .then(() => {
-        return Driver.findOne({ where: { ItemId: null } })
-      })
-      .then(driver => {
-        if (!driver) {
-            // let err = 'No courier is available for now, please try again later'
-          res.redirect(`/customer`)
-        } else {
-          driverContact.fullName = driver.fullName
-          driverContact.phone = driver.phone
-          driverContact.url = driver.profileUrl
-          return Driver.update(
-              { ItemId: req.params.itemId },
-              { where: { id: driver.id } }
-          )
-        }
-      })
-      .then(driver => {
-        console.log(driverContact, req.session.userId);
-        res.render('customers/finishBuy', { driverContact, userId: req.session.userId })
-      })
-      .catch(err => {
-        console.log(err);
-      })
-    }
-
-  static profile(req, res) {
-  // console.log(req.session.userId);
-    Customer.findByPk(req.session.userId, { include: [Item] })
-    .then(customer => {
-      res.render('customers/customerProfile', { customer })
-    })  
   }
 
-  static postProfile(req, res) {
-    const {fullName, email, phone, address, password} = req.body
-    let newUpdate = {
-      fullName,
-      email,
-      phone,
-      address,
-      password
-    } 
+  static async profile(req, res, next) {
+    try {
+      const customer = await Customer.findByPk(req.session.userId)
+      const orders = await Order.findAll({
+        where: { CustomerId: req.session.userId },
+        include: [OrderItem],
+        order: [['createdAt', 'DESC']],
+        limit: 5
+      })
+      res.render('customers/customerProfile', {
+        customer,
+        orders,
+        formatPrice,
+        formatDate,
+        statusLabel,
+        errors: []
+      })
+    } catch (err) {
+      next(err)
+    }
+  }
 
-    Customer.update(newUpdate, {
-      where: { id: req.session.userId}
-    })
-    .then(() => {
+  static async postProfile(req, res, next) {
+    try {
+      const { fullName, email, phone, address, password } = req.body
+      const customer = await Customer.findByPk(req.session.userId)
+      if (!customer) {
+        req.flash('error', 'Akun tidak ditemukan')
+        return res.redirect('/login')
+      }
+
+      customer.fullName = fullName
+      customer.email = email
+      customer.phone = phone
+      customer.address = address
+      if (password && password.trim() !== '') {
+        customer.password = password
+      }
+
+      await customer.save()
+      req.session.fullName = customer.fullName
+      req.session.email = customer.email
+      req.flash('success', 'Profil berhasil diperbarui')
       res.redirect('/customer/profile')
-    })
-    .catch(err => {
-      res.send(err)
-    })
-
+    } catch (err) {
+      const errors = err.errors
+        ? err.errors.map(e => e.message)
+        : [err.message || 'Gagal memperbarui profil']
+      try {
+        const customer = await Customer.findByPk(req.session.userId)
+        const orders = await Order.findAll({
+          where: { CustomerId: req.session.userId },
+          include: [OrderItem],
+          order: [['createdAt', 'DESC']],
+          limit: 5
+        })
+        res.render('customers/customerProfile', {
+          customer, orders, formatPrice, formatDate, statusLabel, errors
+        })
+      } catch (e) {
+        next(e)
+      }
+    }
   }
 }
 

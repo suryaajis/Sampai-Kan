@@ -1,109 +1,77 @@
-const {Driver, Customer, Item, Category} = require('../models/index')
-const { Op } = require('sequelize')
-var bcrypt = require('bcryptjs');
+const { Driver, Customer } = require('../models')
+
+function getModelByRole(role) {
+  if (role === 'Customer') return Customer
+  if (role === 'Driver') return Driver
+  return null
+}
 
 class SignController {
   static getRegister(req, res) {
-    let err = undefined
-    res.render('registerForm', {err})
+    res.render('registerForm', { errors: [], old: {} })
   }
 
-  static postRegister(req, res) {
-    const {fullName, email, password, address, phone, role} = req.body
-    let newUser = {
-      fullName,
-      email,
-      address,
-      phone,
-      password
+  static async postRegister(req, res) {
+    const { fullName, email, password, address, phone, role } = req.body
+
+    const Model = getModelByRole(role)
+    if (!Model) {
+      return res.render('registerForm', {
+        errors: ['Silakan pilih role (Customer atau Driver)'],
+        old: req.body
+      })
     }
 
-    if( role === 'Customer') {
-      Customer.create(newUser)
-      .then(data => {
-        res.redirect('/login')
-      })
-      .catch(err => {
-        console.log(err)
-        err = err.errors.map(el => el.message )
-        res.render('registerForm', {err})
-      })
-    } else if (role === 'Driver') {
-      Driver.create(newUser)
-      .then(data => {
-        res.redirect('/login')
-      })
-      .catch(err => {
-        err = err.errors.map(el => el.message )
-        res.render('registerForm', {err})
-      })
-    } else {
-      let err = 'Role kosong, pilih salah satu'
-      res.render('registerForm', {err})
+    try {
+      await Model.create({ fullName, email, password, address, phone })
+      req.flash('success', 'Registrasi berhasil! Silakan login.')
+      res.redirect('/login')
+    } catch (err) {
+      const errors = err.errors
+        ? err.errors.map(e => e.message)
+        : [err.message || 'Registrasi gagal']
+      res.render('registerForm', { errors, old: req.body })
     }
   }
-
 
   static getLogin(req, res) {
-    let invalid = req.query.error
-    res.render('loginForm', {invalid})
+    res.render('loginForm', { old: {} })
   }
 
-  static postLogin(req, res) {
-    const {email, password, role} = req.body
-    let error = 'Invalid username/password'
-    let model;
+  static async postLogin(req, res) {
+    const { email, password, role } = req.body
+    const Model = getModelByRole(role)
 
-    if(role === 'Customer') {
-      model = Customer
-    } else if ( role === 'Driver') {
-      model = Driver
-    } else {
-      req.session.isLogin = false
-      res.redirect(`/login?error=${error}`)
+    if (!Model) {
+      req.flash('error', 'Silakan pilih role untuk login')
+      return res.redirect('/login')
     }
 
-    model.findOne({
-      where: {email}
-    })
-    .then(data => {
-      // console.log(data)
-      if(data) {
-        let check = bcrypt.compareSync(password, data.password)
-
-        if(check) {
-          req.session.userId = data.id
-          req.session.email = email
-          req.session.isLogin = true
-          req.session.role = role
-          if(role === 'Customer' ) {
-            res.redirect('/customer')
-          } else {
-            res.redirect('/driver')
-          }
-        } else {
-          req.session.isLogin = false 
-          res.redirect(`/login?error=${error}`)
-        }
-      
-      } else if (data === null) {
-        req.session.isLogin = false
-        res.redirect(`/login?error=${error}`)
+    try {
+      const user = await Model.findOne({ where: { email } })
+      if (!user || !user.checkPassword(password)) {
+        req.flash('error', 'Email atau password salah')
+        return res.redirect('/login')
       }
-    })
-    .catch(err => {
-      console.log(err)
-      res.send(err)
-    })
 
+      req.session.userId = user.id
+      req.session.email = user.email
+      req.session.fullName = user.fullName
+      req.session.isLogin = true
+      req.session.role = role
+
+      req.flash('success', `Selamat datang, ${user.fullName}!`)
+      res.redirect(role === 'Customer' ? '/customer' : '/driver')
+    } catch (err) {
+      console.error(err)
+      req.flash('error', 'Terjadi kesalahan saat login')
+      res.redirect('/login')
+    }
   }
-
 
   static getLogout(req, res) {
-    req.session.destroy()
-    res.redirect('/login')
+    req.session.destroy(() => res.redirect('/login'))
   }
 }
-
 
 module.exports = SignController
