@@ -1,26 +1,72 @@
-<!-- Navbar (sit on top) -->
-<div class="w3-top">
-  <div class="w3-bar" id="myNavbar">
-    <a class="w3-bar-item w3-button w3-hover-black w3-hide-medium w3-hide-large w3-right" href="javascript:void(0);" onclick="toggleFunction()" title="Toggle Navigation Menu">
-      <i class="fa fa-bars"></i>
-    </a>
-    <a href="/" class="w3-bar-item w3-button">HOME</a>
-    <a href="/customer" class="w3-bar-item w3-button w3-hide-small"><i class="fa fa-th"></i> LIST ITEM</a>
-    <a href="/customer/profile" class="w3-bar-item w3-button w3-hide-small"><i class="fa fa-user"></i> PROFILE</a>
-    <a href="/logout" class="w3-bar-item w3-button w3-hide-small"><i class="fa fa-user"></i> LOGOUT</a>
+<nav class="sticky top-0 z-40 bg-white shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 md:px-6">
+    <div class="flex items-center justify-between h-16 gap-4">
+      <a href="/customer" class="flex items-center gap-2 shrink-0">
+        <div class="w-10 h-10 rounded-full bg-primary flex items-center justify-center">
+          <i class="fa-solid fa-motorcycle text-white"></i>
+        </div>
+        <span class="text-xl font-bold text-gray-800 hidden sm:inline">Sampai-<span class="text-primary">Kan</span></span>
+      </a>
 
-    <form action="/customer" method="GET" style="float: right; display:flex; margin-right: 10px;">
-      <input class="w3-input w3-btn" type="text" name="search" style="margin-right: 5px; color: black;" placeholder="Search by name">
-      <button type="submit" class="w3-btn"><i class="fa fa-search"></i></button>
+      <form action="/customer" method="GET" class="flex-1 max-w-xl hidden md:block">
+        <div class="relative">
+          <input type="text" name="search" placeholder="Cari menu favoritmu..."
+                 class="w-full pl-11 pr-4 py-2.5 bg-gray-100 rounded-full border border-transparent focus:border-primary focus:bg-white focus:outline-none transition"
+                 value="<%= typeof filters !== 'undefined' ? filters.search : '' %>">
+          <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+        </div>
+      </form>
+
+      <div class="flex items-center gap-2 md:gap-4">
+        <a href="/customer/orders" class="relative p-2 text-gray-700 hover:text-primary" title="Pesanan">
+          <i class="fa-solid fa-receipt text-xl"></i>
+        </a>
+        <a href="/customer/cart" class="relative p-2 text-gray-700 hover:text-primary" title="Keranjang">
+          <i class="fa-solid fa-cart-shopping text-xl"></i>
+          <% if (cartCount > 0) { %>
+            <span class="absolute -top-0.5 -right-0.5 min-w-5 h-5 px-1 text-xs font-bold text-white bg-primary rounded-full flex items-center justify-center"><%= cartCount %></span>
+          <% } %>
+        </a>
+
+        <div class="relative group hidden md:block">
+          <button class="flex items-center gap-2 px-3 py-2 rounded-full hover:bg-gray-100">
+            <div class="w-8 h-8 rounded-full bg-primary-light flex items-center justify-center">
+              <i class="fa-solid fa-user text-primary"></i>
+            </div>
+            <span class="font-medium text-sm"><%= session.fullName || 'Profil' %></span>
+            <i class="fa-solid fa-chevron-down text-xs text-gray-400"></i>
+          </button>
+          <div class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-lg border border-gray-100 opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all">
+            <a href="/customer/profile" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50 rounded-t-lg"><i class="fa-solid fa-user w-5 text-primary"></i>Profil Saya</a>
+            <a href="/customer/orders" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50"><i class="fa-solid fa-receipt w-5 text-primary"></i>Riwayat Pesanan</a>
+            <a href="/customer/cart" class="flex items-center gap-3 px-4 py-3 hover:bg-gray-50"><i class="fa-solid fa-cart-shopping w-5 text-primary"></i>Keranjang</a>
+            <hr class="border-gray-100">
+            <a href="/logout" class="flex items-center gap-3 px-4 py-3 hover:bg-red-50 text-red-600 rounded-b-lg"><i class="fa-solid fa-right-from-bracket w-5"></i>Keluar</a>
+          </div>
+        </div>
+
+        <button id="mobile-menu-toggle" class="md:hidden text-gray-700 text-xl">
+          <i class="fa-solid fa-bars"></i>
+        </button>
+      </div>
+    </div>
+
+    <form action="/customer" method="GET" class="md:hidden pb-3">
+      <div class="relative">
+        <input type="text" name="search" placeholder="Cari menu..."
+               class="w-full pl-11 pr-4 py-2.5 bg-gray-100 rounded-full focus:outline-none"
+               value="<%= typeof filters !== 'undefined' ? filters.search : '' %>">
+        <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+      </div>
     </form>
-    
-  </div>
 
-  <!-- Navbar on small screens -->
-  <div id="navDemo" class="w3-bar-block w3-white w3-hide w3-hide-large w3-hide-medium">
-    <a href="/" class="w3-bar-item w3-button" onclick="toggleFunction()">HOME</a>
-    <a href="/register" class="w3-bar-item w3-button" onclick="toggleFunction()">REGISTER</a>
-    <a href="/login" class="w3-bar-item w3-button" onclick="toggleFunction()">LOGIN</a>
-    <a href="#" class="w3-bar-item w3-button">SEARCH</a>
+    <div id="mobile-menu" class="md:hidden hidden pb-4 space-y-1 border-t pt-2">
+      <a href="/customer" class="flex items-center gap-3 py-2.5 text-gray-700"><i class="fa-solid fa-utensils w-5 text-primary"></i>Jelajah Menu</a>
+      <a href="/customer/orders" class="flex items-center gap-3 py-2.5 text-gray-700"><i class="fa-solid fa-receipt w-5 text-primary"></i>Riwayat Pesanan</a>
+      <a href="/customer/profile" class="flex items-center gap-3 py-2.5 text-gray-700"><i class="fa-solid fa-user w-5 text-primary"></i>Profil</a>
+      <a href="/logout" class="flex items-center gap-3 py-2.5 text-red-600"><i class="fa-solid fa-right-from-bracket w-5"></i>Keluar</a>
+    </div>
   </div>
-</div>
+</nav>
+
+<%- include('flash') %>

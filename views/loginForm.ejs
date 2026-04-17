@@ -1,38 +1,75 @@
-<%- include('partials/header') %> 
-  <%- include('partials/navbar') %> 
-  
+<% const pageTitle = 'Masuk' %>
+<%- include('partials/header', { pageTitle }) %>
+<%- include('partials/navbar') %>
 
-  
-  <!-- Container (Contact Section) -->
-  <div class="w3-content w3-container w3-padding-64" id="contact">
-    <h1 class="w3-center">LOGIN</h1>
-    
-    <% if (invalid) { %>
-      <p style="color: red;"><%= invalid %></p>
-    <% } %>
-    
-  <div class="w3-row w3-padding-32 w3-section">
-    
-      <form action="/login" method="POST">
+<section class="flex-1 py-12 md:py-20 px-4">
+  <div class="max-w-5xl mx-auto grid md:grid-cols-2 bg-white rounded-3xl shadow-xl overflow-hidden">
+    <div class="hidden md:flex hero-gradient text-white p-10 flex-col justify-between">
+      <div>
+        <div class="flex items-center gap-2 mb-6">
+          <div class="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
+            <i class="fa-solid fa-motorcycle text-white text-xl"></i>
+          </div>
+          <span class="text-2xl font-bold">Sampai-Kan</span>
+        </div>
+        <h2 class="text-3xl font-extrabold leading-tight mb-3">Senang Bertemu Lagi!</h2>
+        <p class="opacity-90">Masuk untuk mulai memesan makanan favoritmu atau terima pesanan baru sebagai driver.</p>
+      </div>
+      <img src="https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=600&h=400&fit=crop"
+           class="rounded-2xl mt-6 object-cover aspect-video" alt="Food">
+    </div>
 
-        <input class="w3-input w3-border" type="text" placeholder="Email" name="email"><br>
+    <div class="p-8 md:p-10">
+      <h1 class="text-3xl font-bold mb-2">Masuk</h1>
+      <p class="text-gray-500 mb-6">Belum punya akun? <a href="/register" class="text-primary font-semibold hover:underline">Daftar di sini</a></p>
 
-        <input class="w3-input w3-border" type="password" placeholder="Password" name="password"><br>
+      <form action="/login" method="POST" class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+          <div class="relative">
+            <i class="fa-solid fa-envelope absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <input type="email" name="email" required placeholder="nama@email.com"
+                   class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none">
+          </div>
+        </div>
 
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+          <div class="relative">
+            <i class="fa-solid fa-lock absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+            <input type="password" name="password" required placeholder="Masukkan password"
+                   class="w-full pl-11 pr-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 focus:outline-none">
+          </div>
+        </div>
 
-        <select name="role" class="w3-select w3-border">
-          <option value="" selected disabled>Select Role</option>
-          <option value="Driver">Driver</option>
-          <option value="Customer">Customer</option>
-        </select>
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Masuk sebagai</label>
+          <div class="grid grid-cols-2 gap-3">
+            <label class="relative cursor-pointer">
+              <input type="radio" name="role" value="Customer" class="peer sr-only" required>
+              <div class="border-2 border-gray-200 rounded-xl p-4 text-center peer-checked:border-primary peer-checked:bg-primary-light">
+                <i class="fa-solid fa-user text-2xl text-primary"></i>
+                <div class="font-semibold mt-2">Customer</div>
+                <div class="text-xs text-gray-500">Pesan makanan</div>
+              </div>
+            </label>
+            <label class="relative cursor-pointer">
+              <input type="radio" name="role" value="Driver" class="peer sr-only" required>
+              <div class="border-2 border-gray-200 rounded-xl p-4 text-center peer-checked:border-brand-green peer-checked:bg-green-50">
+                <i class="fa-solid fa-motorcycle text-2xl text-brand-green"></i>
+                <div class="font-semibold mt-2">Driver</div>
+                <div class="text-xs text-gray-500">Antar pesanan</div>
+              </div>
+            </label>
+          </div>
+        </div>
 
-        <button class="w3-button w3-black w3-right w3-section" type="submit">
-          <i class="fa fa-paper-plane"></i> LOGIN
+        <button type="submit" class="w-full btn-primary py-3 rounded-xl font-semibold">
+          <i class="fa-solid fa-right-to-bracket mr-2"></i>Masuk
         </button>
       </form>
     </div>
   </div>
-</div>
+</section>
 
-
-<%- include('partials/footer') %> 
+<%- include('partials/footer') %>

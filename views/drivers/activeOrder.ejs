@@ -1,0 +1,126 @@
+<% const pageTitle = 'Detail Pesanan #' + order.id %>
+<%- include('../partials/header', { pageTitle }) %>
+<%- include('../partials/nav-driver') %>
+
+<% const m = statusLabel(order.status) %>
+<% const steps = statusLabel.STEPS %>
+<% const currentIdx = steps.indexOf(order.status) %>
+
+<section class="max-w-5xl mx-auto px-4 md:px-6 py-8 flex-1 w-full">
+  <a href="/driver" class="inline-flex items-center gap-2 text-gray-600 hover:text-brand-green mb-4">
+    <i class="fa-solid fa-arrow-left"></i> Kembali ke dashboard
+  </a>
+
+  <div class="bg-white rounded-3xl p-6 mb-4">
+    <div class="flex items-start justify-between flex-wrap gap-3">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="font-bold text-xl">#<%= String(order.id).padStart(5, '0') %></span>
+          <span class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full <%= m.color %>">
+            <i class="fa-solid <%= m.icon %>"></i> <%= m.label %>
+          </span>
+        </div>
+        <p class="text-sm text-gray-500 mt-1"><%= formatDate(order.createdAt) %></p>
+      </div>
+    </div>
+
+    <!-- Status Timeline -->
+    <div class="mt-6">
+      <div class="flex items-center justify-between">
+        <% steps.forEach((s, i) => { const sMeta = statusLabel(s) %>
+          <div class="flex-1 flex flex-col items-center text-center">
+            <div class="w-10 h-10 rounded-full flex items-center justify-center <%= i <= currentIdx ? 'bg-brand-green text-white' : 'bg-gray-200 text-gray-400' %> <%= i === currentIdx && i !== steps.length - 1 ? 'ring-4 ring-brand-green/30' : '' %>">
+              <i class="fa-solid <%= sMeta.icon %>"></i>
+            </div>
+            <span class="text-xs font-medium mt-2 <%= i <= currentIdx ? 'text-gray-700' : 'text-gray-400' %>"><%= sMeta.label %></span>
+          </div>
+          <% if (i < steps.length - 1) { %>
+            <div class="h-0.5 flex-1 mx-1 <%= i < currentIdx ? 'bg-brand-green' : 'bg-gray-200' %>"></div>
+          <% } %>
+        <% }) %>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-4 mb-4">
+    <!-- Customer Info -->
+    <div class="bg-white rounded-2xl p-6">
+      <h3 class="font-bold mb-3"><i class="fa-solid fa-user text-brand-green mr-2"></i>Customer</h3>
+      <div class="space-y-2 text-sm">
+        <div><strong><%= order.Customer.fullName %></strong></div>
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-phone text-gray-400"></i>
+          <span>+62<%= order.Customer.phone %></span>
+          <a href="tel:+62<%= order.Customer.phone %>" class="ml-auto text-brand-green font-medium text-xs">Telepon</a>
+        </div>
+        <div class="flex items-center gap-2">
+          <i class="fa-solid fa-envelope text-gray-400"></i>
+          <span class="truncate"><%= order.Customer.email %></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delivery -->
+    <div class="bg-white rounded-2xl p-6">
+      <h3 class="font-bold mb-3"><i class="fa-solid fa-location-dot text-brand-green mr-2"></i>Pengiriman</h3>
+      <div class="space-y-2 text-sm">
+        <div><%= order.address %></div>
+        <div class="text-gray-600"><i class="fa-solid fa-phone mr-1"></i>+62<%= order.phone %></div>
+        <% if (order.notes) { %>
+          <div class="bg-amber-50 border border-amber-200 rounded-lg p-2 text-xs mt-2">
+            <i class="fa-solid fa-note-sticky text-amber-600"></i>
+            <strong>Catatan:</strong> <%= order.notes %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Items -->
+  <div class="bg-white rounded-2xl p-6 mb-4">
+    <h3 class="font-bold mb-3"><i class="fa-solid fa-utensils text-brand-green mr-2"></i>Item Pesanan</h3>
+    <div class="divide-y divide-gray-100">
+      <% order.OrderItems.forEach(oi => { %>
+        <div class="py-2 flex items-center justify-between">
+          <div>
+            <div class="font-medium"><%= oi.name %></div>
+            <div class="text-xs text-gray-500"><%= oi.quantity %> × <%= formatPrice(oi.price) %></div>
+          </div>
+          <div class="font-semibold"><%= formatPrice(oi.subtotal) %></div>
+        </div>
+      <% }) %>
+    </div>
+    <hr class="border-gray-100 my-3">
+    <div class="flex justify-between text-sm"><span class="text-gray-600">Subtotal</span><span><%= formatPrice(order.subtotal) %></span></div>
+    <div class="flex justify-between text-sm"><span class="text-gray-600">Ongkos Kirim</span><span><%= formatPrice(order.deliveryFee) %></span></div>
+    <div class="flex justify-between font-bold mt-2"><span>Total</span><span class="text-primary"><%= formatPrice(order.total) %></span></div>
+    <div class="text-xs text-gray-500 mt-1">Metode: <strong class="uppercase"><%= order.paymentMethod %></strong></div>
+  </div>
+
+  <!-- Actions -->
+  <div class="bg-white rounded-2xl p-6">
+    <h3 class="font-bold mb-3">Aksi</h3>
+    <div class="grid md:grid-cols-3 gap-2">
+      <% if (order.status === 'preparing') { %>
+        <form action="/driver/orders/<%= order.id %>/status" method="POST">
+          <input type="hidden" name="status" value="picked_up">
+          <button class="w-full bg-indigo-500 text-white py-3 rounded-xl font-semibold hover:bg-indigo-600"><i class="fa-solid fa-hands-holding mr-2"></i>Sudah Diambil</button>
+        </form>
+      <% } else if (order.status === 'picked_up') { %>
+        <form action="/driver/orders/<%= order.id %>/status" method="POST">
+          <input type="hidden" name="status" value="delivering">
+          <button class="w-full bg-orange-500 text-white py-3 rounded-xl font-semibold hover:bg-orange-600"><i class="fa-solid fa-truck mr-2"></i>Mulai Antar</button>
+        </form>
+      <% } else if (order.status === 'delivering') { %>
+        <form action="/driver/orders/<%= order.id %>/status" method="POST">
+          <input type="hidden" name="status" value="delivered">
+          <button class="w-full bg-brand-green text-white py-3 rounded-xl font-semibold hover:bg-green-700"><i class="fa-solid fa-check mr-2"></i>Pesanan Sampai</button>
+        </form>
+      <% } else { %>
+        <div class="text-sm text-gray-500 col-span-3">Pesanan ini sudah <%= m.label.toLowerCase() %>.</div>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

@@ -1,11 +1,6 @@
 [
-  {
-    "name": "Food"
-  },
-  {
-    "name": "Drink"
-  },
-  {
-    "name": "Other"
-  }
+  { "name": "Makanan" },
+  { "name": "Minuman" },
+  { "name": "Snack" },
+  { "name": "Dessert" }
 ]

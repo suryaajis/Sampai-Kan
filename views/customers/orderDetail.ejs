@@ -1,0 +1,129 @@
+<% const pageTitle = 'Pesanan #' + order.id %>
+<%- include('../partials/header', { pageTitle }) %>
+<%- include('../partials/nav-customer') %>
+
+<% const meta = statusLabel(order.status) %>
+<% const steps = statusLabel.STEPS %>
+<% const currentIdx = steps.indexOf(order.status) %>
+
+<section class="max-w-5xl mx-auto px-4 md:px-6 py-8 flex-1 w-full">
+  <a href="/customer/orders" class="inline-flex items-center gap-2 text-gray-600 hover:text-primary mb-4">
+    <i class="fa-solid fa-arrow-left"></i> Kembali ke riwayat
+  </a>
+
+  <!-- Header -->
+  <div class="bg-white rounded-3xl p-6 mb-4">
+    <div class="flex items-start justify-between flex-wrap gap-3">
+      <div>
+        <div class="flex items-center gap-2 mb-2">
+          <span class="font-bold text-xl">Pesanan #<%= String(order.id).padStart(5, '0') %></span>
+          <span class="inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-0.5 rounded-full <%= meta.color %>">
+            <i class="fa-solid <%= meta.icon %>"></i> <%= meta.label %>
+          </span>
+        </div>
+        <p class="text-sm text-gray-500"><%= formatDate(order.createdAt) %></p>
+      </div>
+      <% if (order.status === 'pending') { %>
+        <form action="/customer/orders/<%= order.id %>/cancel" method="POST" onsubmit="return confirm('Batalkan pesanan ini?')">
+          <button class="text-sm text-red-600 border border-red-200 px-4 py-2 rounded-full hover:bg-red-50">
+            <i class="fa-solid fa-times mr-1"></i>Batalkan
+          </button>
+        </form>
+      <% } %>
+    </div>
+
+    <!-- Status Timeline -->
+    <% if (order.status !== 'cancelled') { %>
+      <div class="mt-6">
+        <div class="flex items-center justify-between">
+          <% steps.forEach((s, i) => { const sMeta = statusLabel(s) %>
+            <div class="flex-1 flex flex-col items-center text-center <%= i <= currentIdx ? 'step-done' : '' %> <%= i === currentIdx ? 'step-active' : '' %>">
+              <div class="step-dot w-10 h-10 rounded-full flex items-center justify-center <%= i <= currentIdx ? 'bg-brand-green text-white' : 'bg-gray-200 text-gray-400' %> <%= i === currentIdx && i !== steps.length - 1 ? 'ring-4 ring-primary/30' : '' %>">
+                <i class="fa-solid <%= sMeta.icon %>"></i>
+              </div>
+              <span class="text-xs font-medium mt-2 <%= i <= currentIdx ? 'text-gray-700' : 'text-gray-400' %>"><%= sMeta.label %></span>
+            </div>
+            <% if (i < steps.length - 1) { %>
+              <div class="h-0.5 flex-1 mx-1 <%= i < currentIdx ? 'bg-brand-green' : 'bg-gray-200' %>"></div>
+            <% } %>
+          <% }) %>
+        </div>
+      </div>
+    <% } else { %>
+      <div class="mt-6 bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 text-center">
+        <i class="fa-solid fa-circle-xmark mr-1"></i> Pesanan ini telah dibatalkan
+      </div>
+    <% } %>
+  </div>
+
+  <div class="grid lg:grid-cols-3 gap-4">
+    <div class="lg:col-span-2 space-y-4">
+      <!-- Items -->
+      <div class="bg-white rounded-2xl p-6">
+        <h3 class="font-bold mb-4"><i class="fa-solid fa-utensils text-primary mr-2"></i>Detail Pesanan</h3>
+        <div class="divide-y divide-gray-100">
+          <% order.OrderItems.forEach(oi => { %>
+            <div class="py-3 flex items-center justify-between gap-3">
+              <div>
+                <div class="font-medium"><%= oi.name %></div>
+                <div class="text-sm text-gray-500"><%= oi.quantity %> × <%= formatPrice(oi.price) %></div>
+              </div>
+              <div class="font-semibold"><%= formatPrice(oi.subtotal) %></div>
+            </div>
+          <% }) %>
+        </div>
+      </div>
+
+      <!-- Driver Info -->
+      <% if (order.Driver) { %>
+        <div class="bg-white rounded-2xl p-6">
+          <h3 class="font-bold mb-4"><i class="fa-solid fa-motorcycle text-primary mr-2"></i>Driver</h3>
+          <div class="flex items-center gap-4">
+            <img src="<%= order.Driver.profileUrl %>" alt="driver" class="w-14 h-14 rounded-full bg-gray-100 object-cover" onerror="this.src='https://api.dicebear.com/7.x/initials/svg?seed=' + encodeURIComponent('<%= order.Driver.fullName %>')">
+            <div class="flex-1">
+              <div class="font-semibold"><%= order.Driver.fullName %></div>
+              <div class="text-sm text-gray-500"><i class="fa-solid fa-phone mr-1"></i> +62<%= order.Driver.phone %></div>
+            </div>
+            <a href="tel:+62<%= order.Driver.phone %>" class="w-10 h-10 rounded-full bg-brand-green text-white flex items-center justify-center" title="Telepon">
+              <i class="fa-solid fa-phone"></i>
+            </a>
+          </div>
+        </div>
+      <% } else if (order.status === 'pending') { %>
+        <div class="bg-amber-50 border border-amber-200 rounded-2xl p-6 flex items-center gap-3">
+          <i class="fa-solid fa-circle-info text-amber-600 text-xl"></i>
+          <p class="text-sm text-amber-800">Menunggu driver untuk menerima pesananmu...</p>
+        </div>
+      <% } %>
+
+      <!-- Delivery Info -->
+      <div class="bg-white rounded-2xl p-6">
+        <h3 class="font-bold mb-4"><i class="fa-solid fa-location-dot text-primary mr-2"></i>Info Pengiriman</h3>
+        <div class="text-sm space-y-2">
+          <div class="flex gap-2"><span class="text-gray-500 w-24">Alamat</span><span class="flex-1"><%= order.address %></span></div>
+          <div class="flex gap-2"><span class="text-gray-500 w-24">Telepon</span><span>+62<%= order.phone %></span></div>
+          <% if (order.notes) { %>
+            <div class="flex gap-2"><span class="text-gray-500 w-24">Catatan</span><span class="flex-1"><%= order.notes %></span></div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Summary -->
+    <div class="lg:col-span-1">
+      <div class="bg-white rounded-2xl p-6 sticky top-24">
+        <h3 class="font-bold mb-4">Ringkasan Pembayaran</h3>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between"><span class="text-gray-600">Subtotal</span><span><%= formatPrice(order.subtotal) %></span></div>
+          <div class="flex justify-between"><span class="text-gray-600">Ongkos Kirim</span><span><%= formatPrice(order.deliveryFee) %></span></div>
+          <hr class="border-gray-100 my-2">
+          <div class="flex justify-between"><span class="font-semibold">Total</span><span class="font-bold text-primary text-lg"><%= formatPrice(order.total) %></span></div>
+          <div class="flex justify-between text-xs text-gray-500 mt-2"><span>Metode Pembayaran</span><span class="font-medium uppercase"><%= order.paymentMethod %></span></div>
+        </div>
+        <a href="/customer" class="mt-6 block w-full text-center btn-outline py-3 rounded-xl font-semibold">Pesan Lagi</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

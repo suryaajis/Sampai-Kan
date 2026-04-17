@@ -1,20 +1,42 @@
-<!-- Navbar (sit on top) -->
-<div class="w3-top">
-  <div class="w3-bar" id="myNavbar">
-    <a class="w3-bar-item w3-button w3-hover-black w3-hide-medium w3-hide-large w3-right" href="javascript:void(0);" onclick="toggleFunction()" title="Toggle Navigation Menu">
-      <i class="fa fa-bars"></i>
-    </a>
-    <a href="/" class="w3-bar-item w3-button">HOME</a>
-    <a href="/driver" class="w3-bar-item w3-button w3-hide-small"><i class="fa fa-th"></i> PICK ITEM</a>
-    <a href="/logout" class="w3-bar-item w3-button w3-hide-small"><i class="fa fa-user"></i> LOGOUT</a>
-    
-  </div>
+<nav class="sticky top-0 z-40 bg-white shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 md:px-6">
+    <div class="flex items-center justify-between h-16">
+      <a href="/driver" class="flex items-center gap-2">
+        <div class="w-10 h-10 rounded-full bg-brand-green flex items-center justify-center">
+          <i class="fa-solid fa-motorcycle text-white"></i>
+        </div>
+        <span class="text-xl font-bold text-gray-800">Driver <span class="text-brand-green">Panel</span></span>
+      </a>
 
-  <!-- Navbar on small screens -->
-  <div id="navDemo" class="w3-bar-block w3-white w3-hide w3-hide-large w3-hide-medium">
-    <a href="/" class="w3-bar-item w3-button" onclick="toggleFunction()">HOME</a>
-    <a href="/driver" class="w3-bar-item w3-button" onclick="toggleFunction()">PICK ITEM</a>
-    <a href="/logout" class="w3-bar-item w3-button" onclick="toggleFunction()">LOGOUT</a>
-    <a href="#" class="w3-bar-item w3-button">SEARCH</a>
+      <div class="hidden md:flex items-center gap-6">
+        <a href="/driver" class="text-gray-700 hover:text-brand-green font-medium flex items-center gap-2">
+          <i class="fa-solid fa-gauge"></i>Dashboard
+        </a>
+        <a href="/driver/history" class="text-gray-700 hover:text-brand-green font-medium flex items-center gap-2">
+          <i class="fa-solid fa-clock-rotate-left"></i>Riwayat
+        </a>
+        <a href="/driver/profile" class="text-gray-700 hover:text-brand-green font-medium flex items-center gap-2">
+          <i class="fa-solid fa-user"></i>Profil
+        </a>
+      </div>
+
+      <div class="hidden md:flex items-center gap-3">
+        <span class="text-sm text-gray-600">Halo, <strong><%= session.fullName || 'Driver' %></strong></span>
+        <a href="/logout" class="btn-outline px-4 py-1.5 rounded-full text-sm font-medium"><i class="fa-solid fa-right-from-bracket mr-1"></i>Keluar</a>
+      </div>
+
+      <button id="mobile-menu-toggle" class="md:hidden text-gray-700 text-xl">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+    </div>
+
+    <div id="mobile-menu" class="md:hidden hidden pb-4 space-y-1 border-t pt-2">
+      <a href="/driver" class="flex items-center gap-3 py-2.5 text-gray-700"><i class="fa-solid fa-gauge w-5 text-brand-green"></i>Dashboard</a>
+      <a href="/driver/history" class="flex items-center gap-3 py-2.5 text-gray-700"><i class="fa-solid fa-clock-rotate-left w-5 text-brand-green"></i>Riwayat</a>
+      <a href="/driver/profile" class="flex items-center gap-3 py-2.5 text-gray-700"><i class="fa-solid fa-user w-5 text-brand-green"></i>Profil</a>
+      <a href="/logout" class="flex items-center gap-3 py-2.5 text-red-600"><i class="fa-solid fa-right-from-bracket w-5"></i>Keluar</a>
+    </div>
   </div>
-</div>
+</nav>
+
+<%- include('flash') %>

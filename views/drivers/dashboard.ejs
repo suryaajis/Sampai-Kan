@@ -1,0 +1,159 @@
+<% const pageTitle = 'Dashboard Driver' %>
+<%- include('../partials/header', { pageTitle }) %>
+<%- include('../partials/nav-driver') %>
+
+<section class="max-w-6xl mx-auto px-4 md:px-6 py-8 flex-1 w-full">
+  <!-- Greeting + Stats -->
+  <div class="bg-gradient-to-r from-brand-green to-emerald-500 rounded-3xl p-6 md:p-8 text-white mb-6">
+    <div class="flex items-center justify-between flex-wrap gap-4">
+      <div>
+        <h1 class="text-2xl md:text-3xl font-bold">Halo, <%= session.fullName || 'Driver' %>! 🛵</h1>
+        <p class="opacity-90 mt-1">Siap mengantar pesanan hari ini?</p>
+      </div>
+      <div class="grid grid-cols-2 gap-4 md:gap-6">
+        <div class="bg-white/15 backdrop-blur px-5 py-3 rounded-2xl">
+          <div class="text-xs opacity-80">Pesanan Selesai</div>
+          <div class="text-2xl font-bold"><%= completedCount %></div>
+        </div>
+        <div class="bg-white/15 backdrop-blur px-5 py-3 rounded-2xl">
+          <div class="text-xs opacity-80">Pesanan Aktif</div>
+          <div class="text-2xl font-bold"><%= activeOrder ? 1 : 0 %></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Order -->
+  <% if (activeOrder) { const m = statusLabel(activeOrder.status) %>
+    <div class="bg-white rounded-3xl p-6 mb-6 border-2 border-brand-green">
+      <div class="flex items-start justify-between flex-wrap gap-3 mb-4">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-semibold bg-brand-green text-white px-2 py-0.5 rounded-full">PESANAN AKTIF</span>
+            <span class="font-bold">#<%= String(activeOrder.id).padStart(5, '0') %></span>
+          </div>
+          <p class="text-sm text-gray-500 mt-1"><%= formatDate(activeOrder.createdAt) %></p>
+        </div>
+        <span class="inline-flex items-center gap-1 text-sm font-semibold px-3 py-1 rounded-full <%= m.color %>">
+          <i class="fa-solid <%= m.icon %>"></i> <%= m.label %>
+        </span>
+      </div>
+
+      <div class="grid md:grid-cols-2 gap-4 mb-4">
+        <div class="bg-gray-50 rounded-xl p-4">
+          <div class="text-xs text-gray-500 mb-1">Customer</div>
+          <div class="font-semibold"><%= activeOrder.Customer.fullName %></div>
+          <div class="text-sm text-gray-600 mt-1"><i class="fa-solid fa-phone mr-1 text-brand-green"></i>+62<%= activeOrder.Customer.phone %></div>
+        </div>
+        <div class="bg-gray-50 rounded-xl p-4">
+          <div class="text-xs text-gray-500 mb-1">Alamat Pengiriman</div>
+          <div class="text-sm"><%= activeOrder.address %></div>
+        </div>
+      </div>
+
+      <!-- Items summary -->
+      <div class="bg-gray-50 rounded-xl p-4 mb-4">
+        <div class="text-xs text-gray-500 mb-2">Item Pesanan (<%= activeOrder.OrderItems.length %>)</div>
+        <div class="space-y-1">
+          <% activeOrder.OrderItems.forEach(oi => { %>
+            <div class="flex justify-between text-sm"><span><%= oi.quantity %>× <%= oi.name %></span><span class="font-medium"><%= formatPrice(oi.subtotal) %></span></div>
+          <% }) %>
+          <hr class="border-gray-200 my-2">
+          <div class="flex justify-between font-semibold"><span>Total Pembayaran</span><span class="text-primary"><%= formatPrice(activeOrder.total) %></span></div>
+          <div class="text-xs text-gray-500 uppercase"><%= activeOrder.paymentMethod %></div>
+        </div>
+      </div>
+
+      <% if (activeOrder.notes) { %>
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 mb-4 text-sm">
+          <i class="fa-solid fa-note-sticky text-amber-600 mr-1"></i>
+          <strong>Catatan:</strong> <%= activeOrder.notes %>
+        </div>
+      <% } %>
+
+      <div class="flex gap-2">
+        <a href="/driver/orders/<%= activeOrder.id %>" class="flex-1 btn-outline py-3 rounded-xl font-semibold text-center">Lihat Detail</a>
+        <% if (activeOrder.status === 'preparing') { %>
+          <form action="/driver/orders/<%= activeOrder.id %>/status" method="POST" class="flex-1">
+            <input type="hidden" name="status" value="picked_up">
+            <button class="w-full bg-indigo-500 text-white py-3 rounded-xl font-semibold hover:bg-indigo-600">
+              <i class="fa-solid fa-hands-holding mr-2"></i>Sudah Diambil
+            </button>
+          </form>
+        <% } else if (activeOrder.status === 'picked_up') { %>
+          <form action="/driver/orders/<%= activeOrder.id %>/status" method="POST" class="flex-1">
+            <input type="hidden" name="status" value="delivering">
+            <button class="w-full bg-orange-500 text-white py-3 rounded-xl font-semibold hover:bg-orange-600">
+              <i class="fa-solid fa-truck mr-2"></i>Antar Sekarang
+            </button>
+          </form>
+        <% } else if (activeOrder.status === 'delivering') { %>
+          <form action="/driver/orders/<%= activeOrder.id %>/status" method="POST" class="flex-1">
+            <input type="hidden" name="status" value="delivered">
+            <button class="w-full bg-brand-green text-white py-3 rounded-xl font-semibold hover:bg-green-700">
+              <i class="fa-solid fa-check mr-2"></i>Selesaikan
+            </button>
+          </form>
+        <% } %>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Available Orders -->
+  <div>
+    <div class="flex items-center justify-between mb-4">
+      <h2 class="text-xl font-bold">Pesanan Tersedia</h2>
+      <span class="text-sm text-gray-500"><%= availableOrders.length %> pesanan menunggu</span>
+    </div>
+
+    <% if (availableOrders.length === 0) { %>
+      <div class="bg-white rounded-3xl p-12 text-center">
+        <div class="w-24 h-24 mx-auto bg-gray-100 rounded-full flex items-center justify-center text-gray-400">
+          <i class="fa-solid fa-inbox text-4xl"></i>
+        </div>
+        <h3 class="text-lg font-semibold mt-4">Belum ada pesanan baru</h3>
+        <p class="text-gray-500 mt-1">Tunggu sebentar, pesanan akan muncul di sini.</p>
+      </div>
+    <% } else if (activeOrder) { %>
+      <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 text-sm text-amber-800">
+        <i class="fa-solid fa-circle-info mr-1"></i> Selesaikan pesanan aktif terlebih dahulu untuk mengambil pesanan baru.
+      </div>
+    <% } else { %>
+      <div class="grid md:grid-cols-2 gap-4">
+        <% availableOrders.forEach(order => { %>
+          <div class="bg-white rounded-2xl p-5 hover:shadow-md transition">
+            <div class="flex items-start justify-between mb-3">
+              <div>
+                <div class="font-bold">#<%= String(order.id).padStart(5, '0') %></div>
+                <div class="text-xs text-gray-500"><%= formatDate(order.createdAt) %></div>
+              </div>
+              <div class="text-right">
+                <div class="font-bold text-primary"><%= formatPrice(order.total) %></div>
+                <div class="text-xs text-gray-500 uppercase"><%= order.paymentMethod %></div>
+              </div>
+            </div>
+            <div class="space-y-1 mb-3">
+              <div class="text-sm"><i class="fa-solid fa-user text-gray-400 mr-2"></i><%= order.Customer.fullName %></div>
+              <div class="text-sm text-gray-600 line-clamp-2"><i class="fa-solid fa-location-dot text-gray-400 mr-2"></i><%= order.address %></div>
+            </div>
+            <div class="flex gap-2 overflow-x-auto no-scrollbar mb-4">
+              <% order.OrderItems.slice(0, 3).forEach(oi => { %>
+                <div class="text-xs bg-gray-100 rounded-full px-3 py-1 whitespace-nowrap"><%= oi.quantity %>× <%= oi.name %></div>
+              <% }) %>
+              <% if (order.OrderItems.length > 3) { %>
+                <div class="text-xs bg-gray-100 rounded-full px-3 py-1 whitespace-nowrap">+<%= order.OrderItems.length - 3 %></div>
+              <% } %>
+            </div>
+            <form action="/driver/orders/<%= order.id %>/accept" method="POST">
+              <button class="w-full bg-brand-green text-white py-2.5 rounded-xl font-semibold hover:bg-green-700">
+                <i class="fa-solid fa-check-circle mr-2"></i>Terima Pesanan
+              </button>
+            </form>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

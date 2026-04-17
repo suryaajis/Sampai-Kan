@@ -1,53 +1,97 @@
+<% const pageTitle = 'Jelajah Menu' %>
+<%- include('../partials/header', { pageTitle }) %>
+<%- include('../partials/nav-customer') %>
 
-<%- include('../partials/header') %> 
-    <%- include('../partials/nav-customer') %> 
-    
+<!-- Hero Banner -->
+<section class="hero-gradient text-white">
+  <div class="max-w-7xl mx-auto px-4 md:px-6 py-10 md:py-14">
+    <h1 class="text-3xl md:text-4xl font-extrabold">Halo, <%= session.fullName || 'Customer' %>! 👋</h1>
+    <p class="mt-2 opacity-90">Mau pesan apa hari ini? Ada banyak pilihan menu untukmu.</p>
+  </div>
+</section>
 
-    <!-- Second Parallax Image with Portfolio Text -->
-    <div class="bgimg-2 w3-display-container w3-opacity-min">
-        <div class="w3-display-middle" style="text-align: center;">
-        <span class="w3-xxlarge w3-text-white w3-wide"> GET YOUR FOODS AND BAVERAGES</span>
-        </div>
+<!-- Category Pills -->
+<section class="bg-white border-b sticky top-16 z-30">
+  <div class="max-w-7xl mx-auto px-4 md:px-6 py-3 overflow-x-auto no-scrollbar">
+    <div class="flex items-center gap-2 min-w-max">
+      <a href="/customer" class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap <%= !filters.categoryId ? 'bg-primary text-white' : 'bg-gray-100 hover:bg-gray-200' %>">
+        <i class="fa-solid fa-utensils mr-1"></i>Semua
+      </a>
+      <% const iconMap = { 'Makanan':'fa-bowl-food', 'Minuman':'fa-mug-hot', 'Snack':'fa-cookie-bite', 'Dessert':'fa-ice-cream' } %>
+      <% categories.forEach(cat => { %>
+        <a href="/customer?categoryId=<%= cat.id %>" class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap <%= String(filters.categoryId) === String(cat.id) ? 'bg-primary text-white' : 'bg-gray-100 hover:bg-gray-200' %>">
+          <i class="fa-solid <%= iconMap[cat.name] || 'fa-utensils' %> mr-1"></i><%= cat.name %>
+        </a>
+      <% }) %>
     </div>
-    
-    <!-- Container (Portfolio Section) -->
-    <div class="w3-content w3-container w3-padding-64" id="portfolio">
-        <h3 class="w3-center">Choose Your Order</h3>
-        <p class="w3-center"><em>Let us to deliver your order with fast and efficiently</em></p><br>
-    
-        <div class="w3-row-padding w3-center">
-            <% data.forEach(item => { %>
+  </div>
+</section>
 
-                <div class="w3-col m6" style="margin-bottom: 20px; box-sizing: 1px 1px 10px rgba(0,0,0,0.5);">
-                    <div class="w3-card-4">
-                        <img src="<%= item.imageUrl %>" style="width: 100%;" onclick="onClick(this)" class="w3-hover-opacity">
-                        <div class="w3-container w3-center">
-                            <p><strong><%= item.name %> - <%= item.Category.name %> </strong><br> <%= item.description %> <br><strong><%= formatPrice(item.price) %> </strong> </p>
-                            
-                        </div>
-                        <% if (item.CustomerId) { %>
-                            <button class="w3-btn" style="width: 100%; background-color: #cc865b; color: black;">Purchased</button>
-                        <% } else { %>
-                            <a href="/customer/buy/<%= item.id %>" class="w3-btn" style="width: 100%; background-color: #cc865b; color: black;">Buy</a>
-                        <% }%> 
-                    </div>
-                </div>
-            <% }) %>
-
-        </div>
+<!-- Menu Grid -->
+<section class="max-w-7xl mx-auto px-4 md:px-6 py-8 flex-1">
+  <div class="flex items-end justify-between mb-6">
+    <div>
+      <h2 class="text-2xl font-bold">
+        <% if (filters.search) { %>
+          Hasil pencarian "<span class="text-primary"><%= filters.search %></span>"
+        <% } else if (filters.categoryId) { %>
+          <%= (categories.find(c => String(c.id) === String(filters.categoryId)) || {}).name || 'Menu' %>
+        <% } else { %>
+          Semua Menu
+        <% } %>
+      </h2>
+      <p class="text-sm text-gray-500 mt-1"><%= items.length %> menu tersedia</p>
     </div>
-    
-    <!-- Modal for full size images on click-->
-    <div id="modal01" class="w3-modal w3-black" onclick="this.style.display='none'">
-        <span class="w3-button w3-large w3-black w3-display-topright" title="Close Modal Image"><i class="fa fa-remove"></i></span>
-        <div class="w3-modal-content w3-animate-zoom w3-center w3-transparent w3-padding-64">
-        <img id="img01" class="w3-image">
-        <p id="caption" class="w3-opacity w3-large"></p>
-        </div>
+  </div>
+
+  <% if (items.length === 0) { %>
+    <div class="bg-white rounded-2xl p-12 text-center border border-gray-100">
+      <i class="fa-solid fa-utensils-slash text-5xl text-gray-300 mb-4"></i>
+      <h3 class="text-lg font-semibold">Tidak ada menu ditemukan</h3>
+      <p class="text-gray-500 mt-1">Coba cari dengan kata kunci lain atau pilih kategori berbeda.</p>
+      <a href="/customer" class="inline-block mt-4 px-5 py-2 btn-outline rounded-full">Reset pencarian</a>
     </div>
+  <% } else { %>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+      <% items.forEach(item => { %>
+        <div class="menu-card bg-white rounded-2xl overflow-hidden border border-gray-100 flex flex-col">
+          <a href="/customer/item/<%= item.id %>" class="relative aspect-[4/3] bg-gray-100 overflow-hidden block">
+            <img src="<%= item.imageUrl %>" alt="<%= item.name %>" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/400x300?text=Menu'">
+            <span class="absolute top-3 left-3 bg-white/95 text-xs font-semibold px-2 py-1 rounded-full text-gray-700">
+              <i class="fa-solid fa-star text-yellow-500"></i> 4.<%= 5 + (item.id % 5) %>
+            </span>
+            <span class="absolute top-3 right-3 bg-primary text-white text-xs font-semibold px-2 py-1 rounded-full">
+              <i class="fa-solid fa-clock mr-0.5"></i> <%= 15 + (item.id % 15) %> mnt
+            </span>
+          </a>
+          <div class="p-4 flex flex-col flex-1">
+            <div class="text-xs text-primary font-medium"><%= item.Category ? item.Category.name : '' %></div>
+            <a href="/customer/item/<%= item.id %>" class="font-semibold mt-1 line-clamp-2 hover:text-primary"><%= item.name %></a>
+            <p class="text-xs text-gray-500 line-clamp-2 mt-1 flex-1"><%= item.description %></p>
+            <div class="flex items-center justify-between mt-3">
+              <span class="font-bold text-primary text-sm"><%= formatPrice(item.price) %></span>
+              <form action="/customer/cart/add/<%= item.id %>" method="POST">
+                <input type="hidden" name="quantity" value="1">
+                <input type="hidden" name="redirect" value="/customer<%= filters.categoryId ? '?categoryId=' + filters.categoryId : '' %>">
+                <button type="submit" class="w-9 h-9 bg-primary rounded-full flex items-center justify-center text-white hover:bg-primary-dark transition" title="Tambah ke keranjang">
+                  <i class="fa-solid fa-plus"></i>
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</section>
 
+<!-- Sticky Cart Bar -->
+<% if (cartCount > 0) { %>
+  <a href="/customer/cart" class="fixed bottom-4 left-1/2 -translate-x-1/2 md:left-auto md:right-6 md:translate-x-0 bg-primary text-white px-6 py-3 rounded-full shadow-xl hover:bg-primary-dark transition flex items-center gap-3 z-40">
+    <i class="fa-solid fa-cart-shopping"></i>
+    <span class="font-semibold"><%= cartCount %> item di keranjang</span>
+    <i class="fa-solid fa-arrow-right"></i>
+  </a>
+<% } %>
 
-<%# console.log(data) %> 
-<%- include('../partials/footer') %> 
-
-<%# console.log(data) %> 
+<%- include('../partials/footer') %>

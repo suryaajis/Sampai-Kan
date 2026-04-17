@@ -1,42 +1,106 @@
 [
   {
-    "name": "Nasi Goreng",
-    "description": "Nasi dengan bumbu-bumbu dapur yang lezat",
-    "price": 20000,
-    "imageUrl": "https://st.depositphotos.com/1692343/5094/i/950/depositphotos_50945415-stock-photo-healthy-homemade-fried-rice.jpg",
+    "name": "Nasi Goreng Spesial",
+    "description": "Nasi goreng khas dengan telur, ayam, dan kerupuk",
+    "price": 25000,
+    "imageUrl": "https://images.unsplash.com/photo-1512058564366-18510be2db19?w=600&h=400&fit=crop",
     "CustomerId": null,
     "CategoryId": 1
   },
   {
-    "name": "Burger",
-    "description": "Fast food dengan roti, daging sapi, selada, dengan saus",
-    "price": 25500,
-    "imageUrl": "https://st2.depositphotos.com/3957801/5642/i/950/depositphotos_56423065-stock-photo-bacon-burger.jpg",
+    "name": "Mie Ayam Bakso",
+    "description": "Mie ayam kampung dengan bakso sapi kenyal",
+    "price": 18000,
+    "imageUrl": "https://images.unsplash.com/photo-1552611052-33e04de081de?w=600&h=400&fit=crop",
     "CustomerId": null,
     "CategoryId": 1
   },
   {
-    "name": "Mie Ayam",
-    "description": "Makanan murah dengan menu mie campur dengan ayam",
-    "price": 12000,
-    "imageUrl": "https://st3.depositphotos.com/34780080/36925/i/1600/depositphotos_369255406-stock-photo-indonesian-food-mie-ayam-noodles.jpg",
+    "name": "Ayam Geprek Sambal Matah",
+    "description": "Ayam crispy dihancurkan dengan sambal matah pedas",
+    "price": 22000,
+    "imageUrl": "https://images.unsplash.com/photo-1569058242253-92a9c755a0ec?w=600&h=400&fit=crop",
+    "CustomerId": null,
+    "CategoryId": 1
+  },
+  {
+    "name": "Burger Daging Keju",
+    "description": "Beef patty juicy dengan keju cheddar dan saus spesial",
+    "price": 32000,
+    "imageUrl": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&h=400&fit=crop",
+    "CustomerId": null,
+    "CategoryId": 1
+  },
+  {
+    "name": "Sate Ayam Madura",
+    "description": "10 tusuk sate ayam dengan bumbu kacang otentik",
+    "price": 28000,
+    "imageUrl": "https://images.unsplash.com/photo-1529563021893-cc83c992d75d?w=600&h=400&fit=crop",
+    "CustomerId": null,
+    "CategoryId": 1
+  },
+  {
+    "name": "Es Teh Manis",
+    "description": "Teh hitam melati dingin yang menyegarkan",
+    "price": 6000,
+    "imageUrl": "https://images.unsplash.com/photo-1556679343-c7306c1976bc?w=600&h=400&fit=crop",
     "CustomerId": null,
     "CategoryId": 2
   },
   {
-    "name": "Jus Jambu",
-    "description": "Minuman sehat dari buah jambu asli",
-    "price": 16000,
-    "imageUrl": "https://st2.depositphotos.com/1055484/10070/i/950/depositphotos_100703178-stock-photo-fresh-guava-juice-on-white.jpg",
+    "name": "Jus Alpukat",
+    "description": "Jus alpukat kental dengan susu dan coklat",
+    "price": 17000,
+    "imageUrl": "https://images.unsplash.com/photo-1623428187969-5da2dcea5ebf?w=600&h=400&fit=crop",
     "CustomerId": null,
     "CategoryId": 2
   },
   {
     "name": "Boba Brown Sugar",
-    "description": "Minuman boba dengan rasa gula aren yang nikmat",
-    "price": 19000,
-    "imageUrl": "https://st2.depositphotos.com/1692343/10724/i/950/depositphotos_107243282-stock-photo-homemade-milk-bubble-tea-with.jpg",
+    "description": "Minuman boba dengan gula aren dan susu segar",
+    "price": 21000,
+    "imageUrl": "https://images.unsplash.com/photo-1558857563-b371033873b8?w=600&h=400&fit=crop",
     "CustomerId": null,
     "CategoryId": 2
+  },
+  {
+    "name": "Kopi Susu Gula Aren",
+    "description": "Espresso dengan susu full cream dan gula aren",
+    "price": 19000,
+    "imageUrl": "https://images.unsplash.com/photo-1561047029-3000c68339ca?w=600&h=400&fit=crop",
+    "CustomerId": null,
+    "CategoryId": 2
+  },
+  {
+    "name": "Kentang Goreng",
+    "description": "French fries renyah dengan saus cocolan",
+    "price": 15000,
+    "imageUrl": "https://images.unsplash.com/photo-1630384060421-cb20d0e0649d?w=600&h=400&fit=crop",
+    "CustomerId": null,
+    "CategoryId": 3
+  },
+  {
+    "name": "Pisang Goreng Coklat",
+    "description": "Pisang goreng crispy dengan topping coklat dan keju",
+    "price": 14000,
+    "imageUrl": "https://images.unsplash.com/photo-1504754524776-8f4f37790ca0?w=600&h=400&fit=crop",
+    "CustomerId": null,
+    "CategoryId": 3
+  },
+  {
+    "name": "Es Krim Coklat",
+    "description": "Es krim premium rasa coklat Belgia",
+    "price": 18000,
+    "imageUrl": "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=600&h=400&fit=crop",
+    "CustomerId": null,
+    "CategoryId": 4
+  },
+  {
+    "name": "Puding Karamel",
+    "description": "Puding susu lembut dengan siraman saus karamel",
+    "price": 16000,
+    "imageUrl": "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=600&h=400&fit=crop",
+    "CustomerId": null,
+    "CategoryId": 4
   }
 ]
