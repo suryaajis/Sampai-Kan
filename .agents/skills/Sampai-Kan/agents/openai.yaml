@@ -1,0 +1,6 @@
+interface:
+  display_name: "Sampai Kan"
+  short_description: "Repo-specific patterns and workflows for Sampai-Kan"
+  default_prompt: "Use the Sampai-Kan repo skill to follow existing architecture, testing, and workflow conventions."
+policy:
+  allow_implicit_invocation: true
