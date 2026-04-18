@@ -10,7 +10,12 @@
     "db:reset": "npx sequelize-cli db:drop && npm run db:setup",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "keywords": ["delivery", "food", "express", "ejs"],
+  "keywords": [
+    "delivery",
+    "food",
+    "express",
+    "ejs"
+  ],
   "author": "",
   "license": "ISC",
   "dependencies": {
@@ -21,6 +26,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.2",
     "method-override": "^3.0.0",
+    "mysql2": "^3.22.1",
     "nodemailer": "^6.6.5",
     "pg": "^8.7.1",
     "sequelize": "^6.6.5"

@@ -1,10 +1,11 @@
 {
   "development": {
-    "username": "postgres",
-    "password": "postgres",
-    "database": "SampaikanDB",
-    "host": "127.0.0.1",
-    "dialect": "postgres"
+    "username": "root",
+    "password": "root",
+    "database": "sampaikan_db",
+    "host": "localhost",
+    "port": 3310,
+    "dialect": "mysql"
   },
   "test": {
     "username": "root",
@@ -16,8 +17,8 @@
   "production": {
     "use_env_variable": "DATABASE_URL",
     "ssl": true,
-    "dialect": "postgres",
-    "protocol": "postgres",
+    "dialect": "mysql",
+    "protocol": "mysql",
     "dialectOptions": {
       "ssl": {
         "require": true,
