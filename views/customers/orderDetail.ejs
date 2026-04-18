@@ -74,6 +74,19 @@
         </div>
       </div>
 
+      <!-- Store Info -->
+      <% if (order.Store) { %>
+        <a href="/customer/stores/<%= order.Store.id %>" class="bg-white rounded-2xl p-5 flex items-center gap-3 hover:shadow-md transition">
+          <img src="<%= order.Store.logoUrl %>" alt="<%= order.Store.name %>" class="w-12 h-12 rounded-xl bg-gray-100 object-cover"
+               onerror="this.src='https://placehold.co/100x100/fff3e0/f7b733?text='+encodeURIComponent('<%= order.Store.name %>')">
+          <div class="flex-1">
+            <div class="text-xs text-gray-500">Pesanan dari toko</div>
+            <div class="font-semibold"><%= order.Store.name %></div>
+          </div>
+          <i class="fa-solid fa-arrow-right text-gray-400"></i>
+        </a>
+      <% } %>
+
       <!-- Driver Info -->
       <% if (order.Driver) { %>
         <div class="bg-white rounded-2xl p-6">

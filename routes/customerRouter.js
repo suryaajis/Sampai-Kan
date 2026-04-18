@@ -5,7 +5,11 @@ const CustomerController = require('../controllers/customerController')
 const CartController = require('../controllers/cartController')
 const OrderController = require('../controllers/orderController')
 
-// Menu browsing
+// Stores
+customerRouter.get('/stores', CustomerController.getStores)
+customerRouter.get('/stores/:storeId', CustomerController.getStoreDetail)
+
+// Menu browsing (all items)
 customerRouter.get('/', CustomerController.getListItems)
 customerRouter.get('/item/:itemId', CustomerController.getItemDetail)
 

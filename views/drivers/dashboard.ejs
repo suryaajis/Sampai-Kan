@@ -39,14 +39,21 @@
         </span>
       </div>
 
-      <div class="grid md:grid-cols-2 gap-4 mb-4">
+      <div class="grid md:grid-cols-3 gap-4 mb-4">
+        <% if (activeOrder.Store) { %>
+          <div class="bg-amber-50 rounded-xl p-4 border border-amber-100">
+            <div class="text-xs text-gray-500 mb-1">Ambil di Toko</div>
+            <div class="font-semibold text-brand-amber"><i class="fa-solid fa-store mr-1"></i><%= activeOrder.Store.name %></div>
+            <div class="text-xs text-gray-600 mt-1 line-clamp-2"><i class="fa-solid fa-location-dot mr-1"></i><%= activeOrder.Store.address %></div>
+          </div>
+        <% } %>
         <div class="bg-gray-50 rounded-xl p-4">
           <div class="text-xs text-gray-500 mb-1">Customer</div>
           <div class="font-semibold"><%= activeOrder.Customer.fullName %></div>
           <div class="text-sm text-gray-600 mt-1"><i class="fa-solid fa-phone mr-1 text-brand-green"></i>+62<%= activeOrder.Customer.phone %></div>
         </div>
         <div class="bg-gray-50 rounded-xl p-4">
-          <div class="text-xs text-gray-500 mb-1">Alamat Pengiriman</div>
+          <div class="text-xs text-gray-500 mb-1">Antar ke</div>
           <div class="text-sm"><%= activeOrder.address %></div>
         </div>
       </div>
@@ -133,6 +140,9 @@
               </div>
             </div>
             <div class="space-y-1 mb-3">
+              <% if (order.Store) { %>
+                <div class="text-sm font-medium text-brand-amber"><i class="fa-solid fa-store text-brand-amber mr-2"></i><%= order.Store.name %></div>
+              <% } %>
               <div class="text-sm"><i class="fa-solid fa-user text-gray-400 mr-2"></i><%= order.Customer.fullName %></div>
               <div class="text-sm text-gray-600 line-clamp-2"><i class="fa-solid fa-location-dot text-gray-400 mr-2"></i><%= order.address %></div>
             </div>

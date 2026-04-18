@@ -72,21 +72,52 @@
 
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Daftar sebagai</label>
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-3 gap-3">
             <label class="relative cursor-pointer">
-              <input type="radio" name="role" value="Customer" class="peer sr-only" <%= old.role === 'Customer' ? 'checked' : '' %> required>
-              <div class="border-2 border-gray-200 rounded-xl p-4 text-center peer-checked:border-primary peer-checked:bg-primary-light">
-                <i class="fa-solid fa-user text-2xl text-primary"></i>
-                <div class="font-semibold mt-2">Customer</div>
+              <input type="radio" name="role" value="Customer" class="peer sr-only role-radio" data-role="Customer" <%= old.role === 'Customer' ? 'checked' : '' %> required>
+              <div class="border-2 border-gray-200 rounded-xl p-3 text-center peer-checked:border-primary peer-checked:bg-primary-light">
+                <i class="fa-solid fa-user text-xl text-primary"></i>
+                <div class="font-semibold mt-1.5 text-sm">Customer</div>
               </div>
             </label>
             <label class="relative cursor-pointer">
-              <input type="radio" name="role" value="Driver" class="peer sr-only" <%= old.role === 'Driver' ? 'checked' : '' %> required>
-              <div class="border-2 border-gray-200 rounded-xl p-4 text-center peer-checked:border-brand-green peer-checked:bg-green-50">
-                <i class="fa-solid fa-motorcycle text-2xl text-brand-green"></i>
-                <div class="font-semibold mt-2">Driver</div>
+              <input type="radio" name="role" value="Driver" class="peer sr-only role-radio" data-role="Driver" <%= old.role === 'Driver' ? 'checked' : '' %> required>
+              <div class="border-2 border-gray-200 rounded-xl p-3 text-center peer-checked:border-brand-green peer-checked:bg-green-50">
+                <i class="fa-solid fa-motorcycle text-xl text-brand-green"></i>
+                <div class="font-semibold mt-1.5 text-sm">Driver</div>
               </div>
             </label>
+            <label class="relative cursor-pointer">
+              <input type="radio" name="role" value="Merchant" class="peer sr-only role-radio" data-role="Merchant" <%= old.role === 'Merchant' ? 'checked' : '' %> required>
+              <div class="border-2 border-gray-200 rounded-xl p-3 text-center peer-checked:border-brand-amber peer-checked:bg-amber-50">
+                <i class="fa-solid fa-store text-xl text-brand-amber"></i>
+                <div class="font-semibold mt-1.5 text-sm">Merchant</div>
+              </div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Merchant-only: store info -->
+        <div id="merchantFields" class="space-y-4 <%= old.role === 'Merchant' ? '' : 'hidden' %>">
+          <div class="bg-amber-50 border border-amber-200 rounded-xl p-3 text-sm text-amber-800">
+            <i class="fa-solid fa-store mr-1"></i> Lengkapi informasi toko Anda
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Nama Toko</label>
+            <input type="text" name="storeName" value="<%= old.storeName || '' %>" placeholder="Warung Mama Sari"
+                   class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-amber focus:ring-2 focus:ring-brand-amber/20 focus:outline-none">
+          </div>
+          <div class="grid sm:grid-cols-2 gap-3">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Alamat Toko</label>
+              <input type="text" name="storeAddress" value="<%= old.storeAddress || '' %>"
+                     class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-amber focus:ring-2 focus:ring-brand-amber/20 focus:outline-none">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">No. Telepon Toko</label>
+              <input type="text" name="storePhone" value="<%= old.storePhone || '' %>"
+                     class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-amber focus:ring-2 focus:ring-brand-amber/20 focus:outline-none">
+            </div>
           </div>
         </div>
 
@@ -101,5 +132,18 @@
     </div>
   </div>
 </section>
+
+<script>
+  document.querySelectorAll('.role-radio').forEach(r => {
+    r.addEventListener('change', () => {
+      const merchantFields = document.getElementById('merchantFields')
+      if (r.dataset.role === 'Merchant' && r.checked) {
+        merchantFields.classList.remove('hidden')
+      } else if (r.checked) {
+        merchantFields.classList.add('hidden')
+      }
+    })
+  })
+</script>
 
 <%- include('partials/footer') %>

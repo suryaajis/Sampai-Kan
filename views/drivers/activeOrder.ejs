@@ -42,6 +42,23 @@
     </div>
   </div>
 
+  <% if (order.Store) { %>
+    <div class="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-4">
+      <div class="flex items-start gap-3">
+        <img src="<%= order.Store.logoUrl %>" alt="<%= order.Store.name %>" class="w-14 h-14 rounded-xl object-cover bg-white"
+             onerror="this.src='https://placehold.co/100x100/fff3e0/f7b733?text='+encodeURIComponent('<%= order.Store.name %>')">
+        <div class="flex-1">
+          <div class="text-xs text-gray-600">Ambil pesanan di</div>
+          <div class="font-bold text-brand-amber"><%= order.Store.name %></div>
+          <div class="text-sm text-gray-700 mt-1"><i class="fa-solid fa-location-dot text-gray-400 mr-1"></i><%= order.Store.address %></div>
+          <% if (order.Store.phone) { %>
+            <div class="text-sm text-gray-700"><i class="fa-solid fa-phone text-gray-400 mr-1"></i>+62<%= order.Store.phone %></div>
+          <% } %>
+        </div>
+      </div>
+    </div>
+  <% } %>
+
   <div class="grid md:grid-cols-2 gap-4 mb-4">
     <!-- Customer Info -->
     <div class="bg-white rounded-2xl p-6">

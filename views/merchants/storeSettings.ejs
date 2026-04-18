@@ -1,0 +1,97 @@
+<% const pageTitle = 'Pengaturan Toko' %>
+<%- include('../partials/header', { pageTitle }) %>
+<%- include('../partials/nav-merchant') %>
+
+<section class="max-w-4xl mx-auto px-4 md:px-6 py-8 flex-1 w-full">
+  <h1 class="text-2xl md:text-3xl font-bold mb-6">Pengaturan Toko</h1>
+
+  <% if (errors && errors.length) { %>
+    <div class="bg-red-50 border border-red-200 text-red-700 rounded-xl p-4 mb-4">
+      <ul class="text-sm list-disc list-inside">
+        <% errors.forEach(e => { %><li><%= e %></li><% }) %>
+      </ul>
+    </div>
+  <% } %>
+
+  <div class="grid lg:grid-cols-3 gap-6">
+    <!-- Preview -->
+    <div class="lg:col-span-1">
+      <div class="bg-white rounded-2xl p-6 sticky top-20">
+        <h3 class="font-bold mb-3 text-sm text-gray-500 uppercase">Preview</h3>
+        <% if (store.logoUrl) { %>
+          <img src="<%= store.logoUrl %>" alt="logo" class="w-full aspect-square rounded-2xl object-cover bg-gray-100"
+               onerror="this.src='https://placehold.co/400x400/fff3e0/f7b733?text='+encodeURIComponent('<%= store.name %>')">
+        <% } else { %>
+          <div class="w-full aspect-square rounded-2xl bg-amber-50 flex items-center justify-center text-5xl">🏪</div>
+        <% } %>
+        <h4 class="font-bold mt-3 text-lg"><%= store.name %></h4>
+        <p class="text-sm text-gray-500 mt-1 line-clamp-3"><%= store.description || 'Tambahkan deskripsi toko untuk menarik customer' %></p>
+        <div class="mt-3 inline-flex items-center gap-1 text-xs font-semibold px-2.5 py-1 rounded-full <%= store.isOpen ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700' %>">
+          <i class="fa-solid <%= store.isOpen ? 'fa-circle-check' : 'fa-circle-pause' %>"></i>
+          <%= store.isOpen ? 'Toko Buka' : 'Toko Tutup' %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form -->
+    <div class="lg:col-span-2">
+      <form action="/merchant/store" method="POST" class="bg-white rounded-2xl p-6 space-y-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nama Toko</label>
+          <input type="text" name="name" required value="<%= store.name %>"
+                 class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-amber focus:ring-2 focus:ring-brand-amber/20 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Deskripsi Toko</label>
+          <textarea name="description" rows="3" placeholder="Ceritakan tentang toko Anda"
+                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-amber focus:ring-2 focus:ring-brand-amber/20 focus:outline-none"><%= store.description || '' %></textarea>
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">URL Logo Toko</label>
+          <input type="url" name="logoUrl" value="<%= store.logoUrl || '' %>" placeholder="https://..."
+                 class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-amber focus:ring-2 focus:ring-brand-amber/20 focus:outline-none">
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Alamat Toko</label>
+          <textarea name="address" rows="2"
+                    class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-amber focus:ring-2 focus:ring-brand-amber/20 focus:outline-none"><%= store.address || '' %></textarea>
+        </div>
+
+        <div class="grid sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">No. Telepon Toko</label>
+            <input type="text" name="phone" value="<%= store.phone || '' %>"
+                   class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-amber focus:ring-2 focus:ring-brand-amber/20 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-1">Email Toko</label>
+            <input type="email" name="email" value="<%= store.email || '' %>"
+                   class="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-brand-amber focus:ring-2 focus:ring-brand-amber/20 focus:outline-none">
+          </div>
+        </div>
+
+        <div class="bg-amber-50 rounded-xl p-4 border border-amber-100">
+          <label class="flex items-center gap-3 cursor-pointer">
+            <input type="checkbox" name="isOpen" <%= store.isOpen ? 'checked' : '' %>
+                   class="w-5 h-5 rounded text-brand-amber focus:ring-brand-amber">
+            <div>
+              <div class="font-semibold">Toko Buka</div>
+              <div class="text-xs text-gray-600">Customer dapat memesan saat toko buka</div>
+            </div>
+          </label>
+        </div>
+
+        <div class="pt-2">
+          <button type="submit" class="bg-brand-amber text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90">
+            <i class="fa-solid fa-floppy-disk mr-2"></i>Simpan Pengaturan
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>
