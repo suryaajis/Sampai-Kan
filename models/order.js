@@ -6,6 +6,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Order.belongsTo(models.Customer, { foreignKey: 'CustomerId' })
       Order.belongsTo(models.Driver, { foreignKey: 'DriverId' })
+      Order.belongsTo(models.Store, { foreignKey: 'StoreId' })
       Order.hasMany(models.OrderItem, { foreignKey: 'OrderId', onDelete: 'CASCADE' })
     }
   }
@@ -13,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
   Order.init({
     CustomerId: DataTypes.INTEGER,
     DriverId: DataTypes.INTEGER,
+    StoreId: DataTypes.INTEGER,
     status: {
       type: DataTypes.STRING,
       defaultValue: 'pending',

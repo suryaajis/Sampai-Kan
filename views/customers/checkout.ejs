@@ -8,6 +8,18 @@
     <h1 class="text-2xl md:text-3xl font-bold">Checkout</h1>
   </div>
 
+  <% if (typeof store !== 'undefined' && store) { %>
+    <div class="bg-white rounded-2xl p-4 mb-4 flex items-center gap-3">
+      <img src="<%= store.logoUrl %>" alt="<%= store.name %>" class="w-12 h-12 rounded-xl object-cover bg-gray-100"
+           onerror="this.src='https://placehold.co/100x100/fff3e0/f7b733?text='+encodeURIComponent('<%= store.name %>')">
+      <div class="flex-1">
+        <div class="text-xs text-gray-500">Pesanan dari</div>
+        <div class="font-semibold"><%= store.name %></div>
+      </div>
+      <a href="/customer/stores/<%= store.id %>" class="text-sm text-primary font-medium hover:underline">Tambah menu →</a>
+    </div>
+  <% } %>
+
   <form action="/customer/checkout" method="POST" class="grid lg:grid-cols-3 gap-6">
     <div class="lg:col-span-2 space-y-4">
       <!-- Delivery Details -->

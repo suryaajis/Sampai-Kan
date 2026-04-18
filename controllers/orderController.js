@@ -1,4 +1,4 @@
-const { Customer, Driver, Order, OrderItem, Item } = require('../models')
+const { Customer, Driver, Store, Merchant, Order, OrderItem, Item } = require('../models')
 const CartController = require('./cartController')
 const formatPrice = require('../helpers/formatPrice')
 const formatDate = require('../helpers/formatDate')
@@ -13,11 +13,15 @@ class OrderController {
         req.flash('error', 'Keranjang masih kosong')
         return res.redirect('/customer')
       }
-      const customer = await Customer.findByPk(req.session.userId)
+      const [customer, store] = await Promise.all([
+        Customer.findByPk(req.session.userId),
+        req.session.cartStoreId ? Store.findByPk(req.session.cartStoreId) : null
+      ])
       res.render('customers/checkout', {
         cart,
         totals: CartController.cartTotals(cart),
         customer,
+        store,
         formatPrice
       })
     } catch (err) {
@@ -37,6 +41,7 @@ class OrderController {
 
       const order = await Order.create({
         CustomerId: req.session.userId,
+        StoreId: req.session.cartStoreId || null,
         status: 'pending',
         subtotal: totals.subtotal,
         deliveryFee: totals.deliveryFee,
@@ -57,7 +62,9 @@ class OrderController {
       })))
 
       req.session.cart = []
-      req.flash('success', 'Pesanan berhasil dibuat! Menunggu driver...')
+      req.session.cartStoreId = null
+      req.session.cartStoreName = null
+      req.flash('success', 'Pesanan berhasil dibuat! Menunggu konfirmasi toko...')
       res.redirect(`/customer/orders/${order.id}`)
     } catch (err) {
       next(err)
@@ -68,7 +75,7 @@ class OrderController {
     try {
       const orders = await Order.findAll({
         where: { CustomerId: req.session.userId },
-        include: [OrderItem, Driver],
+        include: [OrderItem, Driver, Store],
         order: [['createdAt', 'DESC']]
       })
       res.render('customers/orders', {
@@ -86,7 +93,7 @@ class OrderController {
     try {
       const order = await Order.findOne({
         where: { id: req.params.id, CustomerId: req.session.userId },
-        include: [OrderItem, Driver]
+        include: [OrderItem, Driver, Store]
       })
       if (!order) {
         req.flash('error', 'Pesanan tidak ditemukan')
@@ -131,14 +138,14 @@ class OrderController {
       const activeOrder = await Order.findOne({
         where: {
           DriverId: req.session.userId,
-          status: ['preparing', 'picked_up', 'delivering']
+          status: ['picked_up', 'delivering']
         },
-        include: [OrderItem, Customer]
+        include: [OrderItem, Customer, Store]
       })
 
       const availableOrders = await Order.findAll({
-        where: { status: 'pending', DriverId: null },
-        include: [OrderItem, Customer],
+        where: { status: 'preparing', DriverId: null },
+        include: [OrderItem, Customer, Store],
         order: [['createdAt', 'ASC']]
       })
 
@@ -162,7 +169,7 @@ class OrderController {
   static async acceptOrder(req, res, next) {
     try {
       const order = await Order.findOne({
-        where: { id: req.params.id, status: 'pending', DriverId: null }
+        where: { id: req.params.id, status: 'preparing', DriverId: null }
       })
       if (!order) {
         req.flash('error', 'Pesanan sudah diambil driver lain')
@@ -171,7 +178,7 @@ class OrderController {
       const activeExists = await Order.findOne({
         where: {
           DriverId: req.session.userId,
-          status: ['preparing', 'picked_up', 'delivering']
+          status: ['picked_up', 'delivering']
         }
       })
       if (activeExists) {
@@ -180,9 +187,8 @@ class OrderController {
       }
 
       order.DriverId = req.session.userId
-      order.status = 'preparing'
       await order.save()
-      req.flash('success', 'Pesanan diterima. Segera siapkan!')
+      req.flash('success', 'Pesanan diterima. Menuju ke toko!')
       res.redirect('/driver')
     } catch (err) {
       next(err)
@@ -234,7 +240,7 @@ class OrderController {
     try {
       const order = await Order.findOne({
         where: { id: req.params.id, DriverId: req.session.userId },
-        include: [OrderItem, Customer]
+        include: [OrderItem, Customer, Store]
       })
       if (!order) {
         req.flash('error', 'Pesanan tidak ditemukan')
@@ -258,6 +264,102 @@ class OrderController {
       res.render('drivers/history', {
         orders, formatPrice, formatDate, statusLabel
       })
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  // ==== Merchant side ====
+  static async merchantOrders(req, res, next) {
+    try {
+      const storeId = req.session.storeId
+      const { tab } = req.query
+      const activeStatuses = ['pending', 'preparing', 'picked_up', 'delivering']
+      const isHistory = tab === 'history'
+
+      const orders = await Order.findAll({
+        where: {
+          StoreId: storeId,
+          status: isHistory ? ['delivered', 'cancelled'] : activeStatuses
+        },
+        include: [OrderItem, Customer],
+        order: [['createdAt', 'DESC']]
+      })
+      res.render('merchants/orders', {
+        orders, tab: tab || 'active', formatPrice, formatDate, statusLabel
+      })
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  static async merchantOrderDetail(req, res, next) {
+    try {
+      const order = await Order.findOne({
+        where: { id: req.params.id, StoreId: req.session.storeId },
+        include: [OrderItem, Customer, Driver]
+      })
+      if (!order) {
+        req.flash('error', 'Pesanan tidak ditemukan')
+        return res.redirect('/merchant/orders')
+      }
+      res.render('merchants/orderDetail', { order, formatPrice, formatDate, statusLabel })
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  static async merchantConfirmOrder(req, res, next) {
+    try {
+      const order = await Order.findOne({
+        where: { id: req.params.id, StoreId: req.session.storeId, status: 'pending' },
+        include: [Customer]
+      })
+      if (!order) {
+        req.flash('error', 'Pesanan tidak ditemukan atau sudah diproses')
+        return res.redirect('/merchant/orders')
+      }
+      order.status = 'preparing'
+      await order.save()
+
+      if (order.Customer && order.Customer.email) {
+        sendMail({
+          to: order.Customer.email,
+          subject: `Pesanan #${order.id} dikonfirmasi toko`,
+          text: `Halo ${order.Customer.fullName}, pesanan Anda telah dikonfirmasi oleh toko dan sedang disiapkan.`
+        }).catch(() => {})
+      }
+
+      req.flash('success', 'Pesanan dikonfirmasi, sedang disiapkan')
+      res.redirect('/merchant/orders')
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  static async merchantRejectOrder(req, res, next) {
+    try {
+      const order = await Order.findOne({
+        where: { id: req.params.id, StoreId: req.session.storeId, status: 'pending' },
+        include: [Customer]
+      })
+      if (!order) {
+        req.flash('error', 'Pesanan tidak ditemukan atau sudah diproses')
+        return res.redirect('/merchant/orders')
+      }
+      order.status = 'cancelled'
+      await order.save()
+
+      if (order.Customer && order.Customer.email) {
+        sendMail({
+          to: order.Customer.email,
+          subject: `Pesanan #${order.id} ditolak toko`,
+          text: `Maaf ${order.Customer.fullName}, pesanan Anda tidak dapat diproses oleh toko saat ini.`
+        }).catch(() => {})
+      }
+
+      req.flash('success', 'Pesanan ditolak')
+      res.redirect('/merchant/orders')
     } catch (err) {
       next(err)
     }

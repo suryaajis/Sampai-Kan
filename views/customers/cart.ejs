@@ -27,6 +27,19 @@
       </a>
     </div>
   <% } else { %>
+    <% if (session.cartStoreName) { %>
+      <div class="bg-amber-50 border border-amber-200 rounded-2xl p-4 mb-4 flex items-center gap-3">
+        <div class="w-10 h-10 bg-brand-amber text-white rounded-xl flex items-center justify-center"><i class="fa-solid fa-store"></i></div>
+        <div class="flex-1">
+          <div class="text-xs text-gray-600">Pesanan dari toko</div>
+          <div class="font-semibold text-brand-amber"><%= session.cartStoreName %></div>
+        </div>
+        <% if (session.cartStoreId) { %>
+          <a href="/customer/stores/<%= session.cartStoreId %>" class="text-sm text-brand-amber font-medium hover:underline">Lihat menu →</a>
+        <% } %>
+      </div>
+    <% } %>
+
     <div class="grid lg:grid-cols-3 gap-6">
       <div class="lg:col-span-2 space-y-3">
         <% cart.forEach(item => { %>

@@ -1,0 +1,109 @@
+<% const pageTitle = store.name %>
+<%- include('../partials/header', { pageTitle }) %>
+<%- include('../partials/nav-customer') %>
+
+<!-- Store header -->
+<section class="bg-gradient-to-br from-primary to-orange-400 text-white">
+  <div class="max-w-6xl mx-auto px-4 md:px-6 py-8">
+    <a href="/customer/stores" class="inline-flex items-center gap-2 text-white/80 hover:text-white text-sm mb-3">
+      <i class="fa-solid fa-arrow-left"></i> Kembali ke daftar toko
+    </a>
+    <div class="flex items-start gap-4">
+      <img src="<%= store.logoUrl %>" alt="<%= store.name %>" class="w-20 h-20 md:w-24 md:h-24 rounded-2xl object-cover bg-white/20"
+           onerror="this.src='https://placehold.co/200x200/ffffff/ee4d2d?text='+encodeURIComponent('<%= store.name %>')">
+      <div class="flex-1">
+        <div class="flex items-center gap-2 flex-wrap">
+          <h1 class="text-2xl md:text-3xl font-bold"><%= store.name %></h1>
+          <span class="text-xs font-semibold px-2.5 py-1 rounded-full <%= store.isOpen ? 'bg-green-500' : 'bg-red-400' %>">
+            <%= store.isOpen ? 'BUKA' : 'TUTUP' %>
+          </span>
+        </div>
+        <p class="opacity-90 mt-1 text-sm"><%= store.description %></p>
+        <% if (store.address) { %>
+          <div class="flex items-center gap-1 text-xs opacity-80 mt-2">
+            <i class="fa-solid fa-location-dot"></i><%= store.address %>
+          </div>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Category pills -->
+<section class="bg-white border-b sticky top-16 z-30">
+  <div class="max-w-6xl mx-auto px-4 md:px-6 py-3 overflow-x-auto no-scrollbar">
+    <div class="flex items-center gap-2 min-w-max">
+      <a href="/customer/stores/<%= store.id %>" class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap <%= !filters.categoryId ? 'bg-primary text-white' : 'bg-gray-100 hover:bg-gray-200' %>">
+        <i class="fa-solid fa-utensils mr-1"></i>Semua
+      </a>
+      <% const iconMap = { 'Makanan':'fa-bowl-food', 'Minuman':'fa-mug-hot', 'Snack':'fa-cookie-bite', 'Dessert':'fa-ice-cream' } %>
+      <% categories.forEach(cat => { %>
+        <a href="/customer/stores/<%= store.id %>?categoryId=<%= cat.id %>" class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap <%= String(filters.categoryId) === String(cat.id) ? 'bg-primary text-white' : 'bg-gray-100 hover:bg-gray-200' %>">
+          <i class="fa-solid <%= iconMap[cat.name] || 'fa-utensils' %> mr-1"></i><%= cat.name %>
+        </a>
+      <% }) %>
+    </div>
+  </div>
+</section>
+
+<!-- Items -->
+<section class="max-w-6xl mx-auto px-4 md:px-6 py-8 flex-1 w-full">
+  <div class="flex items-end justify-between mb-6">
+    <div>
+      <h2 class="text-xl font-bold">
+        <% if (filters.categoryId) { %>
+          <%= (categories.find(c => String(c.id) === String(filters.categoryId)) || {}).name %>
+        <% } else { %>
+          Menu Toko
+        <% } %>
+      </h2>
+      <p class="text-sm text-gray-500 mt-1"><%= items.length %> menu tersedia</p>
+    </div>
+  </div>
+
+  <% if (items.length === 0) { %>
+    <div class="bg-white rounded-2xl p-12 text-center border border-gray-100">
+      <i class="fa-solid fa-utensils-slash text-5xl text-gray-300 mb-4"></i>
+      <h3 class="text-lg font-semibold">Belum ada menu di kategori ini</h3>
+    </div>
+  <% } else { %>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
+      <% items.forEach(item => { %>
+        <div class="menu-card bg-white rounded-2xl overflow-hidden border border-gray-100 flex flex-col">
+          <a href="/customer/item/<%= item.id %>" class="relative aspect-[4/3] bg-gray-100 overflow-hidden block">
+            <img src="<%= item.imageUrl %>" alt="<%= item.name %>" class="w-full h-full object-cover" onerror="this.src='https://via.placeholder.com/400x300?text=Menu'">
+          </a>
+          <div class="p-4 flex flex-col flex-1">
+            <div class="text-xs text-primary font-medium"><%= item.Category ? item.Category.name : '' %></div>
+            <a href="/customer/item/<%= item.id %>" class="font-semibold mt-1 line-clamp-2 hover:text-primary"><%= item.name %></a>
+            <p class="text-xs text-gray-500 line-clamp-2 mt-1 flex-1"><%= item.description %></p>
+            <div class="flex items-center justify-between mt-3">
+              <span class="font-bold text-primary text-sm"><%= formatPrice(item.price) %></span>
+              <% if (store.isOpen) { %>
+                <form action="/customer/cart/add/<%= item.id %>" method="POST">
+                  <input type="hidden" name="quantity" value="1">
+                  <input type="hidden" name="redirect" value="/customer/stores/<%= store.id %><%= filters.categoryId ? '?categoryId=' + filters.categoryId : '' %>">
+                  <button type="submit" class="w-9 h-9 bg-primary rounded-full flex items-center justify-center text-white hover:bg-primary-dark transition" title="Tambah ke keranjang">
+                    <i class="fa-solid fa-plus"></i>
+                  </button>
+                </form>
+              <% } else { %>
+                <span class="text-xs text-gray-400">Toko tutup</span>
+              <% } %>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</section>
+
+<% if (cartCount > 0) { %>
+  <a href="/customer/cart" class="fixed bottom-4 left-1/2 -translate-x-1/2 md:left-auto md:right-6 md:translate-x-0 bg-primary text-white px-6 py-3 rounded-full shadow-xl hover:bg-primary-dark transition flex items-center gap-3 z-40">
+    <i class="fa-solid fa-cart-shopping"></i>
+    <span class="font-semibold"><%= cartCount %> item di keranjang</span>
+    <i class="fa-solid fa-arrow-right"></i>
+  </a>
+<% } %>
+
+<%- include('../partials/footer') %>

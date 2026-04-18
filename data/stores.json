@@ -1,0 +1,29 @@
+[
+  {
+    "name": "Warung Mama Sari",
+    "description": "Masakan rumahan otentik khas Nusantara, dimasak dengan bahan segar setiap hari",
+    "logoUrl": "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=400&h=400&fit=crop",
+    "address": "Jl. Pahlawan No. 12, Jakarta Selatan",
+    "phone": "81234567890",
+    "email": "warungs@sampaikan.id",
+    "isOpen": true
+  },
+  {
+    "name": "Grill & BBQ Station",
+    "description": "Spesialis burger daging segar dan sate pilihan, dibakar dengan arang pilihan",
+    "logoUrl": "https://images.unsplash.com/photo-1550547660-d9450f859349?w=400&h=400&fit=crop",
+    "address": "Jl. Sudirman No. 45, Jakarta Pusat",
+    "phone": "82198765432",
+    "email": "grill@sampaikan.id",
+    "isOpen": true
+  },
+  {
+    "name": "Minum & Camilan",
+    "description": "Minuman segar, kopi kekinian, jus buah, dan aneka camilan gurih dan manis",
+    "logoUrl": "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?w=400&h=400&fit=crop",
+    "address": "Jl. Gatot Subroto No. 8, Jakarta Barat",
+    "phone": "83156789012",
+    "email": "minuman@sampaikan.id",
+    "isOpen": true
+  }
+]

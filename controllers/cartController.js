@@ -1,4 +1,4 @@
-const { Item, Category } = require('../models')
+const { Item, Category, Store } = require('../models')
 const formatPrice = require('../helpers/formatPrice')
 
 const DELIVERY_FEE = 5000
@@ -34,13 +34,23 @@ class CartController {
     try {
       const { itemId } = req.params
       const quantity = Math.max(1, parseInt(req.body.quantity || 1, 10))
-      const item = await Item.findByPk(itemId)
+      const item = await Item.findByPk(itemId, { include: [Store] })
       if (!item) {
         req.flash('error', 'Menu tidak ditemukan')
         return res.redirect('/customer')
       }
 
       const cart = getCart(req)
+      const cartStoreId = req.session.cartStoreId
+
+      // warn and redirect if mixing stores
+      if (cartStoreId && cart.length > 0 && cartStoreId !== item.StoreId) {
+        const storeName = item.Store ? item.Store.name : 'toko lain'
+        req.flash('error', `Keranjang berisi item dari toko berbeda. Kosongkan keranjang dulu untuk memesan dari ${storeName}.`)
+        const redirect = req.body.redirect || '/customer'
+        return res.redirect(redirect)
+      }
+
       const existing = cart.find(c => c.itemId === item.id)
       if (existing) {
         existing.quantity += quantity
@@ -50,9 +60,14 @@ class CartController {
           name: item.name,
           price: item.price,
           imageUrl: item.imageUrl,
-          quantity
+          quantity,
+          storeId: item.StoreId,
+          storeName: item.Store ? item.Store.name : ''
         })
       }
+
+      req.session.cartStoreId = item.StoreId
+      req.session.cartStoreName = item.Store ? item.Store.name : ''
 
       req.flash('success', `${item.name} ditambahkan ke keranjang`)
       const redirect = req.body.redirect || '/customer'
@@ -88,6 +103,8 @@ class CartController {
 
   static clearCart(req, res) {
     req.session.cart = []
+    req.session.cartStoreId = null
+    req.session.cartStoreName = null
     req.flash('success', 'Keranjang dikosongkan')
     res.redirect('/customer/cart')
   }

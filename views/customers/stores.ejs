@@ -1,0 +1,49 @@
+<% const pageTitle = 'Pilih Toko' %>
+<%- include('../partials/header', { pageTitle }) %>
+<%- include('../partials/nav-customer') %>
+
+<section class="max-w-6xl mx-auto px-4 md:px-6 py-8 flex-1 w-full">
+  <!-- Hero -->
+  <div class="bg-gradient-to-r from-primary to-orange-400 rounded-3xl p-6 md:p-8 text-white mb-6">
+    <h1 class="text-2xl md:text-3xl font-bold">Toko Pilihan untukmu 🏪</h1>
+    <p class="opacity-90 mt-1">Pilih toko favorit dan pesan menu kesukaanmu</p>
+  </div>
+
+  <% if (stores.length === 0) { %>
+    <div class="bg-white rounded-3xl p-12 text-center">
+      <div class="w-20 h-20 mx-auto bg-gray-100 rounded-full flex items-center justify-center text-3xl mb-4">🏪</div>
+      <h3 class="font-semibold text-lg">Belum ada toko terdaftar</h3>
+      <p class="text-gray-500 text-sm mt-1">Toko-toko akan segera bergabung</p>
+    </div>
+  <% } else { %>
+    <div class="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <% stores.forEach(store => { %>
+        <a href="/customer/stores/<%= store.id %>"
+           class="bg-white rounded-2xl overflow-hidden hover:shadow-lg transition group block">
+          <div class="relative aspect-[4/3] bg-gray-100">
+            <img src="<%= store.logoUrl %>" alt="<%= store.name %>" class="w-full h-full object-cover group-hover:scale-105 transition"
+                 onerror="this.src='https://placehold.co/600x400/fff3e0/f7b733?text='+encodeURIComponent('<%= store.name %>')">
+            <div class="absolute top-3 left-3">
+              <span class="text-xs font-semibold px-2.5 py-1 rounded-full <%= store.isOpen ? 'bg-green-500 text-white' : 'bg-gray-700 text-white' %>">
+                <i class="fa-solid <%= store.isOpen ? 'fa-circle-check' : 'fa-circle-pause' %> mr-1"></i>
+                <%= store.isOpen ? 'BUKA' : 'TUTUP' %>
+              </span>
+            </div>
+          </div>
+          <div class="p-4">
+            <h3 class="font-bold text-lg leading-tight group-hover:text-primary transition"><%= store.name %></h3>
+            <p class="text-sm text-gray-500 line-clamp-2 mt-1"><%= store.description || 'Toko pilihan' %></p>
+            <% if (store.address) { %>
+              <div class="text-xs text-gray-500 mt-2 flex items-start gap-1">
+                <i class="fa-solid fa-location-dot text-gray-400 mt-0.5"></i>
+                <span class="line-clamp-1"><%= store.address %></span>
+              </div>
+            <% } %>
+          </div>
+        </a>
+      <% }) %>
+    </div>
+  <% } %>
+</section>
+
+<%- include('../partials/footer') %>

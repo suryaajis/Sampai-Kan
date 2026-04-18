@@ -1,17 +1,33 @@
-const { Item, Category, Customer, Order, OrderItem } = require('../models')
+const { Item, Category, Store, Customer, Order, OrderItem } = require('../models')
 const formatPrice = require('../helpers/formatPrice')
 const formatDate = require('../helpers/formatDate')
 const statusLabel = require('../helpers/statusLabel')
 
 class CustomerController {
-  static async getListItems(req, res, next) {
+  static async getStores(req, res, next) {
     try {
+      const stores = await Store.findAll({ order: [['name', 'ASC']] })
+      res.render('customers/stores', { stores })
+    } catch (err) {
+      next(err)
+    }
+  }
+
+  static async getStoreDetail(req, res, next) {
+    try {
+      const { storeId } = req.params
       const { search, categoryId } = req.query
-      const [items, categories] = await Promise.all([
-        Item.getAll(Category, { search, categoryId }),
+      const [store, items, categories] = await Promise.all([
+        Store.findByPk(storeId),
+        Item.getAll(Category, Store, { search, categoryId, storeId }),
         Category.findAll({ order: [['id', 'ASC']] })
       ])
-      res.render('customers/listItems', {
+      if (!store) {
+        req.flash('error', 'Toko tidak ditemukan')
+        return res.redirect('/customer/stores')
+      }
+      res.render('customers/storeDetail', {
+        store,
         items,
         categories,
         formatPrice,
@@ -22,9 +38,29 @@ class CustomerController {
     }
   }
 
+  static async getListItems(req, res, next) {
+    try {
+      const { search, categoryId } = req.query
+      const [items, categories, stores] = await Promise.all([
+        Item.getAll(Category, Store, { search, categoryId }),
+        Category.findAll({ order: [['id', 'ASC']] }),
+        Store.findAll()
+      ])
+      res.render('customers/listItems', {
+        items,
+        categories,
+        stores,
+        formatPrice,
+        filters: { search: search || '', categoryId: categoryId || '' }
+      })
+    } catch (err) {
+      next(err)
+    }
+  }
+
   static async getItemDetail(req, res, next) {
     try {
-      const item = await Item.findByPk(req.params.itemId, { include: [Category] })
+      const item = await Item.findByPk(req.params.itemId, { include: [Category, Store] })
       if (!item) {
         req.flash('error', 'Menu tidak ditemukan')
         return res.redirect('/customer')

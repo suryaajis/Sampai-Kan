@@ -44,21 +44,29 @@
 
         <div>
           <label class="block text-sm font-medium text-gray-700 mb-2">Masuk sebagai</label>
-          <div class="grid grid-cols-2 gap-3">
+          <div class="grid grid-cols-3 gap-3">
             <label class="relative cursor-pointer">
               <input type="radio" name="role" value="Customer" class="peer sr-only" required>
-              <div class="border-2 border-gray-200 rounded-xl p-4 text-center peer-checked:border-primary peer-checked:bg-primary-light">
-                <i class="fa-solid fa-user text-2xl text-primary"></i>
-                <div class="font-semibold mt-2">Customer</div>
-                <div class="text-xs text-gray-500">Pesan makanan</div>
+              <div class="border-2 border-gray-200 rounded-xl p-3 text-center peer-checked:border-primary peer-checked:bg-primary-light">
+                <i class="fa-solid fa-user text-xl text-primary"></i>
+                <div class="font-semibold mt-1.5 text-sm">Customer</div>
+                <div class="text-[11px] text-gray-500">Pesan makanan</div>
               </div>
             </label>
             <label class="relative cursor-pointer">
               <input type="radio" name="role" value="Driver" class="peer sr-only" required>
-              <div class="border-2 border-gray-200 rounded-xl p-4 text-center peer-checked:border-brand-green peer-checked:bg-green-50">
-                <i class="fa-solid fa-motorcycle text-2xl text-brand-green"></i>
-                <div class="font-semibold mt-2">Driver</div>
-                <div class="text-xs text-gray-500">Antar pesanan</div>
+              <div class="border-2 border-gray-200 rounded-xl p-3 text-center peer-checked:border-brand-green peer-checked:bg-green-50">
+                <i class="fa-solid fa-motorcycle text-xl text-brand-green"></i>
+                <div class="font-semibold mt-1.5 text-sm">Driver</div>
+                <div class="text-[11px] text-gray-500">Antar pesanan</div>
+              </div>
+            </label>
+            <label class="relative cursor-pointer">
+              <input type="radio" name="role" value="Merchant" class="peer sr-only" required>
+              <div class="border-2 border-gray-200 rounded-xl p-3 text-center peer-checked:border-brand-amber peer-checked:bg-amber-50">
+                <i class="fa-solid fa-store text-xl text-brand-amber"></i>
+                <div class="font-semibold mt-1.5 text-sm">Merchant</div>
+                <div class="text-[11px] text-gray-500">Kelola toko</div>
               </div>
             </label>
           </div>

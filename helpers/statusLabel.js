@@ -1,5 +1,5 @@
 const STATUS_META = {
-  pending: { label: 'Menunggu Driver', color: 'bg-amber-100 text-amber-700', icon: 'fa-clock' },
+  pending: { label: 'Menunggu Konfirmasi Toko', color: 'bg-amber-100 text-amber-700', icon: 'fa-clock' },
   preparing: { label: 'Sedang Disiapkan', color: 'bg-blue-100 text-blue-700', icon: 'fa-utensils' },
   picked_up: { label: 'Driver Mengambil Pesanan', color: 'bg-indigo-100 text-indigo-700', icon: 'fa-motorcycle' },
   delivering: { label: 'Dalam Perjalanan', color: 'bg-orange-100 text-orange-700', icon: 'fa-truck' },
