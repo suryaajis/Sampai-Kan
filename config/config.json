@@ -5,20 +5,18 @@
     "database": "sampaikan_db",
     "host": "localhost",
     "port": 3310,
-    "dialect": "mysql"
+    "dialect": "postgres"
   },
   "test": {
     "username": "root",
     "password": null,
     "database": "database_test",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "postgres"
   },
   "production": {
     "use_env_variable": "DATABASE_URL",
-    "ssl": true,
-    "dialect": "mysql",
-    "protocol": "mysql",
+    "dialect": "postgres",
     "dialectOptions": {
       "ssl": {
         "require": true,

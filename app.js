@@ -18,7 +18,23 @@ app.use(express.json())
 app.use(express.static(path.join(__dirname, 'public')))
 app.use(methodOverride('_method'))
 
+// In production (Vercel) use a PostgreSQL-backed session store so sessions
+// survive across serverless invocations. Falls back to MemoryStore locally.
+let sessionStore
+if (process.env.DATABASE_URL) {
+  const { Pool } = require('pg')
+  const pgSession = require('connect-pg-simple')(session)
+  sessionStore = new pgSession({
+    pool: new Pool({
+      connectionString: process.env.DATABASE_URL,
+      ssl: { rejectUnauthorized: false }
+    }),
+    createTableIfMissing: true
+  })
+}
+
 app.use(session({
+  store: sessionStore,
   secret: process.env.SESSION_SECRET || 'sampaikan-super-secret-key',
   resave: false,
   saveUninitialized: true,
@@ -56,4 +72,9 @@ app.use((err, req, res, next) => {
   })
 })
 
-app.listen(port, () => console.log(`Sampai-Kan running on http://localhost:${port}`))
+// Only start the HTTP server when running directly (not imported by Vercel)
+if (require.main === module) {
+  app.listen(port, () => console.log(`Sampai-Kan running on http://localhost:${port}`))
+}
+
+module.exports = app
